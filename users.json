@@ -1,0 +1,51 @@
+[
+  {
+    "user_id": 720130498,
+    "fname": "John",
+    "lname": "Landry",
+    "type": "lecturer",
+    "password": "e!5NR^c1YYCc}p"
+  },
+  {
+    "user_id": 620130499,
+    "fname": "Steven",
+    "lname": "Graves",
+    "type": "student",
+    "password": "be>iL>[^8IUJ$1,"
+  },
+  {
+    "user_id": 620130500,
+    "fname": "Chad",
+    "lname": "Moore",
+    "type": "student",
+    "password": "u`)`CnwK+7XIcRV"
+  },
+  {
+    "user_id": 620130501,
+    "fname": "Breanna",
+    "lname": "Wiley",
+    "type": "student",
+    "password": "G[s$Tu$\\\""
+  },
+  {
+    "user_id": 620130502,
+    "fname": "Rose",
+    "lname": "Green",
+    "type": "student",
+    "password": "Iy\"iL7+i%|"
+  },
+  {
+    "user_id": 620130503,
+    "fname": "Tiffany",
+    "lname": "Drake",
+    "type": "student",
+    "password": "akIYK#w'"
+  },
+  {
+    "user_id": 0,
+    "fname": "Jason",
+    "lname": "Gardner",
+    "type": "admin",
+    "password": ";2E/QZ|\"0Kkd#2!"
+  }
+]
