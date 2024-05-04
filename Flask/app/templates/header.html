@@ -1,3 +1,6 @@
+
+
+
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
   <div class="container-fluid">
     <a class="navbar-brand" href="#">My App</a>
@@ -6,14 +9,30 @@
     </button>
   
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav mr-auto">
+      <ul class="navbar-nav mr-auto flex-grow-1"> <!-- Add flex-grow-1 class to push the following items to the right -->
         <li class="nav-item">
           <a class="nav-link active" href="{{ url_for('home') }}">Home</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="{{ url_for('about') }}">About</a>
         </li>
+       
+      </ul>
+      
+      <ul class="navbar-nav">
+        {% if not session['user_firstname'] %}
+        <li class="nav-item"> <!-- No need for ml-auto class here -->
+          <a class="nav-link" href="{{ url_for('login')}}">login</a>
+        </li>
+        {% endif %}
+        
+        {% if session['user_firstname'] %}
+        <li class="nav-item"> <!-- No need for ml-auto class here -->
+          <a class="nav-link" href="{{ url_for('logout')}}">logout</a>
+        </li>
+        {% endif %}
       </ul>
     </div>
   </div>
 </nav>
+

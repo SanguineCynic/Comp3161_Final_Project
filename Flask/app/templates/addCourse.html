@@ -1,0 +1,23 @@
+<!-- add_course.html -->
+{% extends 'base.html' %}
+{% block header %}
+{% include 'adminHeader.html' %}
+{% endblock %}
+{% block main %}
+{% include 'flash_messages.html' %}
+<div class="container mt-4" style="max-width: 500px;">
+  <form action="{{ url_for('add_course') }}" class="form-login m-auto" method="post">
+    {{ form.csrf_token }}
+    <h2>Add a Course</h2>
+    <div class="form-floating mb-3">
+      {{ form.course_code(class='form-control', placeholder="Enter course code") }}
+      {{ form.course_code.label() }}
+    </div>
+    <div class="form-floating">
+      {{ form.course_name(class='form-control', placeholder="Enter course name") }}
+      {{ form.course_name.label() }}
+    </div>
+    <button class="btn btn-lg btn-primary w-100 mt-3" type="submit">Add Course</button>
+  </form>
+</div>
+{% endblock %}

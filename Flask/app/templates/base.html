@@ -13,7 +13,10 @@
   </head>
   <body>
     <header>
-        {% include "header.html" %}
+      {% block header %}
+       {% include "header.html" %}
+      {% endblock%}
+        
     </header>
     <main>
         <div class="container">

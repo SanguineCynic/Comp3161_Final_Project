@@ -1,60 +1,82 @@
--- Create 3NF tables with "if not exists" clauses to avoid any accidents
+import mysql.connector
 
-CREATE TABLE IF NOT EXISTS User (
+host = "localhost"
+user = "calvin2"
+password = "12345678"
+database = "database_final_project_v1"
+
+connection = mysql.connector.connect(
+    host=host,
+    user=user,
+    password=password
+)
+
+cursor = connection.cursor()
+cursor.execute(f"USE {database};")
+table_creation_queries = [
+    """
+    CREATE TABLE User (
         user_id INT PRIMARY KEY,
         fname VARCHAR(50) NOT NULL,
         lname VARCHAR(50) NOT NULL,
-        account_type VARCHAR(50) NOT NULL,
+        account_type ENUM('student', 'lecturer', 'admin') NOT NULL,
         password VARCHAR(255) NOT NULL
-    );
-
-CREATE TABLE IF NOT EXISTS Course (
+    )
+    """,
+    """
+    CREATE TABLE Course (
         course_code VARCHAR(10) PRIMARY KEY,
         course_name VARCHAR(100) NOT NULL
-    );
-
-CREATE TABLE IF NOT EXISTS Student (
+    )
+    """,
+    """
+    CREATE TABLE Student (
         user_id INT PRIMARY KEY,
         earned_creds INT,
         gpa DECIMAL(3, 2),
         FOREIGN KEY (user_id) REFERENCES User(user_id)
-    );
-
-CREATE TABLE IF NOT EXISTS Registration (
+    )
+    """,
+    """
+    CREATE TABLE Registration (
         user_id INT,
         course_code VARCHAR(10),
         final_average DECIMAL(4, 2),
         PRIMARY KEY (user_id, course_code),
         FOREIGN KEY (user_id) REFERENCES User(user_id),
         FOREIGN KEY (course_code) REFERENCES Course(course_code)
-    );
-
-CREATE TABLE IF NOT EXISTS Teaches (
+    )
+    """,
+    """
+    CREATE TABLE Teaches (
         user_id INT,
         course_code VARCHAR(10),
         PRIMARY KEY (user_id, course_code),
         FOREIGN KEY (user_id) REFERENCES User(user_id),
         FOREIGN KEY (course_code) REFERENCES Course(course_code)
-    );
-
-CREATE TABLE IF NOT EXISTS Section (
+    )
+    """,
+    """
+    CREATE TABLE Section (
         section_id INT PRIMARY KEY,
         course_code VARCHAR(10),
         title VARCHAR(100),
         description TEXT,
         FOREIGN KEY (course_code) REFERENCES Course(course_code)
-    );
-
-CREATE TABLE IF NOT EXISTS Content (
+    )
+    """,
+    """
+    CREATE TABLE Content (
         content_id INT PRIMARY KEY,
         section_id INT,
         title VARCHAR(100),
         files_names JSON,
         material TEXT,
         FOREIGN KEY (section_id) REFERENCES Section(section_id)
-    );
-
-CREATE TABLE IF NOT EXISTS CalendarEvent (
+    )
+    """,
+    """
+    CREATE TABLE CalendarEvent (
         event_id INT PRIMARY KEY,
         section_id INT,
         title VARCHAR(100),
@@ -64,9 +86,10 @@ CREATE TABLE IF NOT EXISTS CalendarEvent (
         start_date DATETIME,
         end_date DATETIME,
         FOREIGN KEY (section_id) REFERENCES Section(section_id)
-    );
-
-CREATE TABLE IF NOT EXISTS Submission (
+    )
+    """,
+    """
+    CREATE TABLE Submission (
         user_id INT,
         event_id INT,
         file_names JSON,
@@ -75,17 +98,19 @@ CREATE TABLE IF NOT EXISTS Submission (
         PRIMARY KEY (user_id, event_id),
         FOREIGN KEY (user_id) REFERENCES User(user_id),
         FOREIGN KEY (event_id) REFERENCES CalendarEvent(event_id)
-    );
-
-CREATE TABLE IF NOT EXISTS DiscussionForum (
+    )
+    """,
+    """
+    CREATE TABLE DiscussionForum (
         forum_id INT PRIMARY KEY,
         course_id VARCHAR(10),
         title VARCHAR(100),
         description TEXT,
         FOREIGN KEY (course_id) REFERENCES Course(course_code)
-    );
-
-CREATE TABLE IF NOT EXISTS DiscussionThread (
+    )
+    """,
+    """
+    CREATE TABLE DiscussionThread (
         thread_id INT PRIMARY KEY,
         forum_id INT,
         user_id INT,
@@ -93,9 +118,10 @@ CREATE TABLE IF NOT EXISTS DiscussionThread (
         content TEXT,
         FOREIGN KEY (forum_id) REFERENCES DiscussionForum(forum_id),
         FOREIGN KEY (user_id) REFERENCES User(user_id)
-    );
-
-CREATE TABLE IF NOT EXISTS Reply (
+    )
+    """,
+    """
+    CREATE TABLE Reply (
         reply_id INT PRIMARY KEY,
         thread_id INT,
         user_id INT,
@@ -104,4 +130,61 @@ CREATE TABLE IF NOT EXISTS Reply (
         FOREIGN KEY (thread_id) REFERENCES DiscussionThread(thread_id),
         FOREIGN KEY (user_id) REFERENCES User(user_id),
         FOREIGN KEY (parent_reply_id) REFERENCES Reply(reply_id)
-    );
+    )
+    """,
+    """
+    CREATE TABLE UserKey (
+        admin_id INT,
+        lecturer_id INT,
+        student_id INT,
+        PRIMARY KEY (admin_id, lecturer_id, student_id)
+    )
+    """
+]
+
+# Execute each table creation query
+for query in table_creation_queries:
+    cursor.execute(query)
+    # pass
+
+connection.commit()
+cursor.close()
+connection.close()
+
+
+def drop_tables(host, user, password):
+    connection = mysql.connector.connect(
+    host=host,
+    user=user,
+    password=password
+    )
+    
+
+    cursor = connection.cursor()
+    cursor.execute(f"USE {database};")
+    cursor.execute("""DROP TABLE IF EXISTS Reply""")
+    cursor.execute("""DROP TABLE IF EXISTS DiscussionThread""")
+    cursor.execute("""DROP TABLE IF EXISTS DiscussionForum""")
+    cursor.execute("""DROP TABLE IF EXISTS Submission""")
+    cursor.execute("""DROP TABLE IF EXISTS CalendarEvent""")
+    cursor.execute("""DROP TABLE IF EXISTS Content""")
+    cursor.execute("""DROP TABLE IF EXISTS Section""")
+    cursor.execute("""DROP TABLE IF EXISTS Teaches""")
+    cursor.execute("""DROP TABLE IF EXISTS Registration""")
+    cursor.execute("""DROP TABLE IF EXISTS Student""")
+    cursor.execute("""DROP TABLE IF EXISTS Course""")
+    cursor.execute("""DROP TABLE IF EXISTS User""")
+
+    connection.commit()
+    cursor.close()
+    connection.close()
+
+
+if __name__ == "__main__":
+    # uncomment if you want to drop all tables
+    # drop_tables(host, user, password)
+    pass
+
+
+
+
