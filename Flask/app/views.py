@@ -3,7 +3,7 @@ from app import app, login_manager
 from flask import render_template, request, redirect, url_for, flash, session, abort, jsonify
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.utils import secure_filename
-from app.forms import LoginForm, UploadForm, CourseForm, UserForm
+from app.forms import LoginForm, UploadForm, CourseForm, UserForm, CourseRegistrationForm, MembershipForm
 from flask import send_from_directory
 from flask_login import logout_user
 from datetime import datetime
@@ -14,6 +14,9 @@ from enum import Enum
 from flask_bcrypt import Bcrypt
 import secrets
 import string
+import json
+import jwt
+from datetime import datetime, timedelta
 
 
 bcrypt = Bcrypt()
@@ -75,8 +78,249 @@ def load_user(user_id):
     return None
 
 
+@login_required
+@app.route('/register', methods=['POST', 'GET'])
+def register():
+    form = CourseRegistrationForm()
+    if request.method == 'POST':
+        # submission from postman
+        if  not form.validate_on_submit():
+            try:
+                # check authorization
+                token = request.headers.get('Authorization')
+                if not token:
+                    return jsonify({"message": "No token provided"}), 400
+                try:
+                    user_data = jwt.decode(token, app.config['SECRET_KEY'], algorithms="HS256")
+                    if user_data['account_type'] == UserType.STUDENT.value or user_data['account_type'] == UserType.ADMIN.value:
+                        pass
+                    else:
+                        return jsonify({"message": "Student/ admin authorization required"}), 400
+                except:
+                    return jsonify({"message": "Invalid token"}), 400
+
+                form = request.get_json()
+                course_code = form['course_code'].upper()
+                user_id = form['user_id']
+                # check if user exists
+                cursor = connection.cursor()
+                cursor.execute("SELECT * FROM user WHERE user_id = %s", (user_id,))
+                result = cursor.fetchone()
+                if not result:
+                    return jsonify({"message":"User does not exist"}), 400
+
+                if user_data['account_type'] == UserType.STUDENT.value:
+                    # ensure that the authorization is for that student
+                    if str(user_id) != str(user_data['user_id']):
+                        return jsonify({"message": "Student, you are not the owner of this account. You are not authorized to make this request"}), 400
+                            
+
+                # check if course exists
+                cursor = connection.cursor()
+                cursor.execute("SELECT * FROM course WHERE course_code = %s", (course_code,))
+                result = cursor.fetchone()
+                if not result:
+                    return jsonify({"message":"Course does not exist"}), 400
+                
+                # check if user is already registered
+                cursor.execute("SELECT * FROM registration WHERE course_code = %s AND user_id = %s", (course_code, user_id))
+                result = cursor.fetchone()
+                
+                if result:
+                    return jsonify({"message":"You are already registered for this course"}), 400
+                
+                # check if user has already registered for 5 courses
+                cursor.execute("SELECT * FROM registration WHERE user_id = %s", (user_id,))
+                result = cursor.fetchall()
+                if len(result) >= 5:
+                    return jsonify({"message":"You have already registered for 5  courses"}), 400
+                
+                # register user for course
+                cursor.execute("INSERT INTO registration ( user_id, course_code) VALUES (%s, %s)", (user_id, course_code))
+                connection.commit()
+                cursor.close()
+                user = {
+                    'message': 'User registered successfully',
+                    'user_id': user_id,
+                    'course_code': course_code
+                }
+
+                return jsonify(user), 200
+            
+            except:
+                form = CourseRegistrationForm()
+                # pass
+
+        # submission from form   
+        elif form.validate_on_submit():
+            # user_id = form.user_id.data
+            course_code = form.course_code.data.upper()
+            try:
+               cursor = connection.cursor()
+
+               # check if course exists
+               cursor.execute("SELECT * FROM course WHERE course_code = %s", (course_code,))
+               result = cursor.fetchone()
+               if not result:
+                   flash("Course does not exist", 'danger')
+                   return render_template('register.html', form=form)
+               
+               # check if user is already registered
+               cursor.execute("SELECT * FROM registration WHERE course_code = %s AND user_id = %s", (course_code, session['user_id']))
+               result = cursor.fetchone()
+               if result:
+                   print(result)
+                   flash("You are already registered for this course", 'danger')
+                   return render_template('register.html', form=form)
+               
+               # check if user has already registered for 5 courses
+               cursor.execute("SELECT * FROM registration WHERE user_id = %s", (session['user_id'],))
+               result = cursor.fetchall()
+               if len(result) >= 5:
+                   flash("You have already registered for 5  courses", 'danger')
+                   return render_template('register.html', form=form)
+            
+               # register user
+               cursor.execute("INSERT INTO registration (course_code, user_id) VALUES (%s, %s)", (course_code, session['user_id']))
+               connection.commit()
+               cursor.close()
+               form.course_code.data = ''
+               flash("Course Registered Successfully: " + course_code, 'success')
+               return render_template('register.html', form=form)
+            
+            except:
+                render_template('register.html', form=form)
+    # user must be student or admin
+    if session['account_type'] == UserType.STUDENT.value or session['account_type'] == UserType.ADMIN.value:
+        pass
+    else:
+        return redirect(url_for('home'))
+    return render_template('register.html', form=form)
+
+
+@app.route('/teach', methods=['POST', 'GET'])
+def teach():
+    form = CourseRegistrationForm()
+    if form.validate_on_submit():
+            # user_id = form.user_id.data
+            
+            course_code = form.course_code.data.upper()
+            try:
+               cursor = connection.cursor()
+
+               # check if course exists
+               cursor.execute("SELECT * FROM course WHERE course_code = %s", (course_code,))
+               result = cursor.fetchone()
+               if not result:
+                   flash("Course does not exist", 'danger')
+                   return render_template('teach.html', form=form)
+               
+               # check if the course is already been taught
+               cursor.execute("SELECT * FROM teaches WHERE course_code = %s", (course_code, ))
+               result = cursor.fetchall()
+               if result:
+                   print(result)
+                   flash("This course is already been taught", 'danger')
+                   return render_template('teach.html', form=form)
+               
+               # check if lecturer has already registered for 5 courses
+               cursor.execute("SELECT * FROM teaches WHERE user_id = %s", (session['user_id'],))
+               result = cursor.fetchall()
+               if len(result) >= 5:
+                   flash("You are already teaching for 5  courses", 'danger')
+                   return render_template('teach.html', form=form)
+            
+               # register user
+               cursor.execute("INSERT INTO teaches (course_code, user_id) VALUES (%s, %s)", (course_code, session['user_id']))
+               connection.commit()
+               cursor.close()
+               form.course_code.data = ''
+               flash("Course Registered Successfully: " + course_code, 'success')
+               return render_template('teach.html', form=form)
+            
+            except:
+                render_template('register.html', form=form)
+
+    # submission from postman
+    else:
+        
+        try:
+            if request.method == 'POST':
+
+                #extract data from json
+                data = request.get_json()
+                user_id = data['user_id']
+                course_code = data['course_code'].upper()
+
+                # check for authorization
+                token = request.headers.get('Authorization')
+                if not token:
+                    return jsonify({"message": "No token provided"}), 400
+                else:
+                    try: 
+                        user_data = jwt.decode(token, app.config['SECRET_KEY'], algorithms="HS256")
+                        if user_data['account_type'] == UserType.ADMIN.value or user_data['account_type'] == UserType.LECTURER.value:
+                            if user_data['account_type'] == UserType.LECTURER.value:
+                                # check to ensure that the user is authenticated
+                                if user_data['user_id'] != user_id:
+                                    return jsonify({"message": "You are not authorized to perform this action"}), 400
+                                else:
+                                    pass
+                            pass
+                        else:
+                            return jsonify({"message": "There was an error retrieving token data"}), 400
+                    except:
+                        return jsonify({"There was an error assigning user to course"}), 400
+                
+                try:
+                    cursor = connection.cursor()
+
+                    # check if course exists
+                    cursor.execute("SELECT * FROM course WHERE course_code = %s", (course_code,))
+                    result = cursor.fetchone()
+                    if not result:
+                        return jsonify({"message": "Course does not exist"}), 400
+                    
+                    # check if the course is already been taught
+                    cursor.execute("SELECT * FROM teaches WHERE course_code = %s", (course_code, ))
+                    result = cursor.fetchall()
+                    if result:
+                        return jsonify({"message": "This course has already been taught"}), 400
+                    
+                    # check if lecturer has already registered for 5 courses
+                    cursor.execute("SELECT * FROM teaches WHERE user_id = %s", (user_id,))
+                    result = cursor.fetchall()
+                    if len(result) >= 5:
+                        return jsonify({"message": "You are already teaching for 5  courses"}), 400
+                    
+                    # register user
+                    cursor.execute("INSERT INTO teaches (course_code, user_id) VALUES (%s, %s)", (course_code, user_id))
+                    connection.commit()
+                    cursor.close()
+            
+                    response = jsonify({"message": "Course Registered Successfully: ", "user_id": user_id ,"course_code": course_code})
+                    return response, 200
+                
+                except:
+                    return jsonify({"message": "Course Registration Failed"}), 400
+
+
+                #########################################################################################
+                
+        except:
+           return jsonify({"message": "Course Registration Failed"}), 400
+
+   
+    # user must be lecturer or admin
+    if session['account_type'] == UserType.LECTURER.value or session['account_type'] == UserType.ADMIN.value:
+        pass
+    else:
+        return redirect(url_for('home'))
+    return render_template('teach.html', form=form)
+
 @app.route('/login', methods=['POST', 'GET'])
 def login():
+    #this section is for postman
     try:
         form = request.get_json()
         if form:
@@ -95,20 +339,28 @@ def login():
                     session['user_firstname'] = fname
                     session['account_type'] = account_type
 
+                    expiration_delta = app.config.get('JWT_EXPIRATION_DELTA', timedelta(hours=1))
+                    expiration_time = datetime.utcnow() + expiration_delta
+
                     user_data = {
-                        "user_id": user_id,
+                        "user_id": str(user_id), 
                         "fname": fname,
                         "lname": lname,
-                        "account_type": account_type
+                        "account_type": account_type,
+                        'exp': expiration_time
 
                     }
-                    return jsonify({"message":"Login Successful", 'user': user_data}), 200
+
+                    token = jwt.encode( user_data, app.config['SECRET_KEY'], algorithm='HS256')
+
+                    return jsonify({"message":"Login Successful", 'user': user_data, 'token': token}), 200
                 else:
                     return jsonify({"message":"Invalid username or password"}), 400
             else:
                 return jsonify({"message":"Invalid username or password"}), 400
-
+    #this section is for web
     except:
+        
         form= LoginForm()
         try:
             if session['account_type']:
@@ -130,12 +382,17 @@ def login():
                     login_user(user)
                     session['user_firstname'] = fname
                     session['account_type'] = account_type
+                    session['user_id'] = user_id
+                
+                   
                     
                     if current_user.is_authenticated:
                         return redirect(url_for("home"))
             else:
                 flash('Invalid username or password', 'danger')
         return render_template("login.html", form=form)
+    
+
 
 @app.route('/logout')
 @login_required
@@ -185,11 +442,31 @@ def add_course():
     form = CourseForm()
     if request.method == 'POST':
         # Get the data from postman api request    
-        if request.headers.get('Content-Type') == 'application/json':
+        if request.headers.get('Content-Type') == 'application/json' :
             data = request.get_json()
+
+            # only admin can add course
+            token = request.headers.get('Authorization')
+            if not token:
+                return jsonify({"message": "No token provided"}), 400
+            try:
+                user_data = jwt.decode(token, app.config['SECRET_KEY'], algorithms="HS256")
+                if user_data['account_type'] != UserType.ADMIN.value:
+                    return jsonify({"message": "Admin authorization required"}), 400
+            except:
+                return jsonify({"message": "Invalid token"}), 400
             course_code = data['course_code']
             course_name = data['course_name']
-            # Insert the course into the database
+
+            # check if the course already exists
+            cursor = connection.cursor()
+            cursor.execute("SELECT * FROM course WHERE course_code = %s", (course_code,))
+            result = cursor.fetchone()
+            cursor.close()
+            if result:
+                return jsonify({"message": "Course already exists"}), 400
+
+            # Insert the course into the database 
             cursor = connection.cursor()
             try:
                 query = "INSERT INTO course (course_code, course_name) VALUES (%s, %s)"
@@ -200,6 +477,8 @@ def add_course():
             except:
                 return jsonify({"message": "Course not added"}), 400
             
+        
+        
         if form.validate_on_submit():
             course_code = form.course_code.data
             course_name = form.course_name.data
@@ -216,7 +495,8 @@ def add_course():
                 return render_template('addCourse.html', form=form)
             except:
                 flash('Course not added', 'danger')
-
+    if session['account_type'] != UserType.ADMIN.value:
+            return redirect(url_for('home'))
     return render_template('addCourse.html', form=form)
 
 def get_courses():
@@ -234,20 +514,61 @@ def view_courses():
     result = cursor.fetchall()
     cursor.close()
     courses = []
+    user_ = {
+        'user_id': "",
+        'user_type': ""
+    }
     for course in result:
         courses.append({'course_code':course[0], 'course_name':course[1]})
-    
-    if courses:
-        
-        return render_template('courses.html', courses=courses)
+
+    return render_template('courses.html', courses=courses, user_=user_)
 
 @app.route('/courses/api', methods = ['GET'])
 def view_courses_api():
     if request.method == 'GET':
-        return jsonify({"courses":get_courses()})
+        courses = []
+        for course in get_courses():
+            courses.append({'course_code':course[0], 'course_name':course[1]})
+        return jsonify(courses )
+    
+@app.route('/drop_course/<course_code>')
+def drop_course(course_code):
+    if 'account_type' not in session:
+        return redirect(url_for('login'))
+    
+    cursor = connection.cursor()
+    if session['account_type'] == UserType.LECTURER.value:
+       
+        try:
+            query = "DELETE FROM teaches WHERE course_code = %s AND user_id = %s"
+            cursor.execute(query, (course_code, session['user_id']))
+            connection.commit()
+            cursor.close()
+            flash('Course dropped successfully', 'success')
+            return redirect(url_for('view_course_by_lecturer', user_id=session['user_id']))
+        except:
+            flash('Course not dropped', 'danger')
+            return redirect(url_for('view_course_by_lecturer', user_id=session['user_id']))
+        
+    if session['account_type'] == UserType.STUDENT.value:
+        try:
+            query = "DELETE FROM registration WHERE course_code = %s AND user_id = %s"
+            cursor.execute(query, (course_code, session['user_id']))
+            connection.commit()
+            cursor.close()
+            flash('Course dropped successfully', 'success')
+            return redirect(url_for('view_course_by_student', student_id=session['user_id']))
+        except:
+            flash('Course not dropped', 'danger')
+            return redirect(url_for('view_course_by_student', student_id=session['user_id']))
+   
     
 @app.route('/courses/student/<student_id>')
 def view_course_by_student(student_id):
+    
+    if 'account_type' not in session:
+        return redirect(url_for('login'))
+    
     courses = []
 
     try:
@@ -260,7 +581,11 @@ def view_course_by_student(student_id):
             courses.append({'course_code':course[0], 'course_name':course[1]})
     except:
         pass
-    return render_template('courses.html', courses=courses)
+
+    if session['account_type'] == UserType.STUDENT.value:
+            return render_template('myCoursesStudent.html', courses=courses)
+    
+    return render_template('courses.html', courses=courses, user_={"user_id":student_id,'user_type':UserType.STUDENT.value})
 
 @app.route('/courses/student/api/<student_id>')
 def view_course_by_student_api(student_id):
@@ -273,24 +598,32 @@ def view_course_by_student_api(student_id):
         courses = []
         for course in result:
             courses.append({'course_code':course[0], 'course_name':course[1]})
-        return jsonify({"courses":courses})
+        return jsonify(courses)
     except:
         pass
 
 @app.route('/courses/lecturer/<user_id>')
 def view_course_by_lecturer(user_id):
+    if 'account_type' not in session:
+        return redirect(url_for('login'))
+    
+    courses = []
+
     try:
-        query = "SELECT * FROM teaches where user_id = %s" 
+        query = "SELECT teaches.course_code, course_name FROM teaches JOIN course ON teaches.course_code = course.course_code where user_id = %s" 
         cursor = connection.cursor()
         cursor.execute( query, (user_id,))
         result = cursor.fetchall()
         cursor.close()
-        courses = []
         for course in result:
             courses.append({'course_code':course[0], 'course_name':course[1]})
     except:
         pass
-    return render_template('courses.html', courses=courses)
+
+    if session['account_type'] == UserType.LECTURER.value:
+            return render_template('myCoursesLecturer.html', courses=courses)
+    
+    return render_template('courses.html', courses=courses, user_={"user_id":user_id,'user_type':UserType.LECTURER.value})
 
 @app.route('/courses/lecturer/api/<user_id>')
 def view_course_by_lecturer_api(user_id):
@@ -303,7 +636,7 @@ def view_course_by_lecturer_api(user_id):
         courses = []
         for course in result:
             courses.append({'course_code':course[0], 'course_name':course[1]})
-        return jsonify({"courses":courses})
+        return jsonify(courses)
     except:
         pass
 
@@ -337,6 +670,10 @@ def add_user():
             fname = form['fname']
             lname = form['lname']
             account_type = form['account_type']
+
+            # account_type = must be student or lecturer or admin
+            if account_type.lower() not in ['student', 'lecturer', 'admin']:
+                return jsonify({"message":"Invalid account type"})
 
             random_password = generate_random_password(7)
             #generate a password using bycrypt
@@ -414,16 +751,62 @@ def add_user():
                 
             except:
                 flash('User not added', 'danger')
+
+        # restrict access to non-admin users
+        if session['account_type'] != UserType.ADMIN.value:
+            return redirect(url_for('home'))
         return render_template('addUser.html', form=form)
 
-# @login_required
-# @app.route('/api/add/user', methods = ['GET', 'POST'])
-# def add_user_api():
+
+# retrieve members of a course
+@login_required
+@app.route('/retrieve/members/<course_code>', methods = ['GET', 'POST']) 
+def retrieve_members_by_course(course_code):
+    #check if the course exists
+    cursor = connection.cursor()
+    cursor.execute("SELECT * FROM course WHERE course_code = %s", (course_code,))
+    result = cursor.fetchone()
+    if not result:
+        flash('Course does not exist', 'danger')
+        return redirect(url_for('retrieve_members'))
     
+    cursor = connection.cursor()
+    cursor.execute("SELECT registration.user_id, user.fname, user.lname FROM registration \
+                   JOIN user on registration.user_id  = user.user_id WHERE registration.course_code = %s", (course_code,))
+    students = cursor.fetchall()
+
+    cursor.execute("SELECT teaches.user_id, user.fname, user.lname FROM teaches \
+                   JOIN user on teaches.user_id  = user.user_id WHERE teaches.course_code = %s", (course_code,))
+    lecturers = cursor.fetchall()
+    # print(students)
     
+    if not students:
+        students = []
+    else:
+        students = [dict(zip(['student_id', 'fname', 'lname'], student)) for student in students]
+    if not lecturers:
+        lecturers = []
+    else:
+        lecturers = [dict(zip(['student_id', 'fname', 'lname'], lecturer)) for lecturer in lecturers]
+
+    cursor.close()
+    form = MembershipForm()
+    flash('Course retrieved successfully', 'success')
+    return render_template('retrieveMembers.html', students=students, lecturers=lecturers, course_code=course_code, form=form) 
 
 
-
+@login_required
+@app.route('/retrieve/members', methods = ['GET', 'POST'])
+def retrieve_members():
+    
+    form  = MembershipForm()
+    if form.validate_on_submit():
+        # flash('Course retrieved successfully', 'success')
+        course_code = form.course_code.data
+        return redirect(url_for('retrieve_members_by_course', course_code=course_code))
+    students = []
+    lecturers = []
+    return render_template('retrieveMembers.html', students=students, lecturers=lecturers, course_code="", form=form)
 
 
 

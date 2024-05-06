@@ -6,36 +6,35 @@
       </button>
     
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto flex-grow-1">
+        <ul class="navbar-nav mr-auto flex-grow-1"> <!-- Add flex-grow-1 class to push the following items to the right -->
           <li class="nav-item">
             <a class="nav-link active" href="{{ url_for('home') }}">Home</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="{{ url_for('about') }}">About</a>
           </li>
-          <li class="nav-item dropdown"> <!-- Add dropdown class here -->
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              Courses
-            </a>
-            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <li><a class="dropdown-item" href="{{ url_for('add_course')}}">Add Course</a></li>
-              <li><a class="dropdown-item" href="{{ url_for('view_courses')}}">View Courses</a></li>
-              <li><a class="dropdown-item" href="{{ url_for('retrieve_members')}}">Members</a></li>
-            </ul>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('teach')}}">Teach</a>
           </li>
 
+          <!-- @app.route('/courses/student/<student_id>')
+               def view_course_by_student(student_id): -->
+
+
           <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('add_user')}}">Add User</a>
+            <a class="nav-link" href="{{url_for('view_course_by_lecturer', user_id=session['user_id'])}}">My Courses</a>
           </li>
         </ul>
         <ul class="navbar-nav">
-          <li class="nav-item">
-            <a class="nav-link" href="#">Hello {{session['user_firstname']}}</a>
+          <li class="nav-item"> <!-- No need for ml-auto class here -->
+            <a class="nav-link" href="#">{{session['account_type'].capitalize()}}: {{session['user_firstname']}} </a>
+            
           </li>
-          <li class="nav-item">
+          <li class="nav-item"> <!-- No need for ml-auto class here -->
             <a class="nav-link" href="{{ url_for('logout')}}">logout</a>
           </li>
         </ul>
       </div>
+      
     </div>
   </nav>

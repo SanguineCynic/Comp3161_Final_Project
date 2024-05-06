@@ -15,6 +15,7 @@ course_list = load_json('course.json')
 # Assuming you have lists of user IDs and course IDs
 user_ids = [user['user_id'] for user in lecturer_list if user['type'] == 'lecturer']
 course_codes = [course['course_code'] for course in course_list]
+
 print(f"The course code list is: {course_codes}")
 
 # Create Teaches list
@@ -26,8 +27,8 @@ random.shuffle(course_codes)
 
 # Iterate over each user_id and assign courses to teach
 for user_id in user_ids:
-    # Randomly select the number of courses to teach (between 1 and 5 or the remaining courses)
-    num_courses = min(random.randint(1, 5), len(course_codes))
+    # Randomly select the number of courses to teach (between 1 and 5 or the remaining courses) start with
+    num_courses = min(random.randint(1, 4), len(course_codes))
     
     # Select courses to teach (up to num_courses)
     selected_courses = course_codes[:num_courses]

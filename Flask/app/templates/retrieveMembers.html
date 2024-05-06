@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% if session['account_type'] == 'admin' %}
+{% block header %}
+{% include 'adminHeader.html' %}
+{% endblock %}
+{% endif %}
+
+
+
+
+{% block main %}
+{% include "flash_messages.html" %}
+
+<form action="{{ url_for('retrieve_members')}}" method="post" class="mb-4">
+    <!-- set witdth to 200px -->
+    {{ form.csrf_token }}
+    <div class="form-group st " style="width: 400px;">
+        <label for="course_code">Course Code: </label>
+        
+        {{ form.course_code(class='form-control', placeholder="Enter Course Code") }}
+        
+        <button type="submit" class="btn btn-primary">Apply Filter</button>
+    </div>
+</form>
+
+<div class="container mt-4">
+    <h3 style="font-size: 15px;">Courses for Students in {{course_code}}</h3>
+    <div class="row row-cols-1 row-cols-md-4 g-4">
+      {% for student in students %}
+      <div class="col">
+        <div class="card h-100">
+          <div class="card-body">
+            <h5 class="card-title">{{student.student_id  }}</h5>
+            <p class="card-text">{{ student.fname }} {{student.lname}}</p>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <h3  style="font-size: 15px; margin-top: 50px">Courses for Lecturer in {{course_code}}</h3>
+    <div class="row row-cols-1 row-cols-md-4 g-4">
+      {% for lecturer in lecturers %}
+      <div class="col">
+        <div class="card h-100">
+          <div class="card-body">
+            <h5 class="card-title">{{lecturer.student_id  }}</h5>
+            <p class="card-text">{{ lecturer.fname }} {{lecturer.lname}}</p>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block header %}
+{% include 'lecturerHeader.html' %}
+{% endblock %}
+
+
+{% block main %}
+
+<div class="container" style="max-width: 500px;">
+  {% include 'flash_messages.html' %}
+  <h2>Course Registration</h2>
+  <form action="{{ url_for('teach') }}"  method="POST">
+    {{ form.csrf_token }}
+    
+    <div class="form-group mt-3">
+      {{ form.course_code.label(class="form-label") }}
+      {{ form.course_code(class="form-control", placeholder="Enter course code") }}
+    </div>
+    <div class= "mt-3" >
+        <button type="submit" class="btn btn-primary">Register</button>
+    </div>
+  </form>
+</div>
+{% endblock %}
+

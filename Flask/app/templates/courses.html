@@ -6,6 +6,8 @@
 
 {% block main %}
 
+
+
 <form action="{{ url_for('admin_filter')}}" method="post" class="mb-4">
     <!-- set witdth to 200px -->
     <div class="form-group st " style="width: 400px;">
@@ -22,7 +24,10 @@
     <button type="submit" class="btn btn-primary">Apply Filter</button>
 </form>
 
+
+
 <div class="container mt-4">
+  <h3 style="font-size: 15px;">Courses for {{user_['user_type']}}:  {{user_['user_id']}}</h3>
   <div class="row row-cols-1 row-cols-md-4 g-4">
     {% for course in courses %}
     <div class="col">
@@ -37,3 +42,4 @@
   </div>
 </div>
 {% endblock %}
+

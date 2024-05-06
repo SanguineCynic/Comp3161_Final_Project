@@ -1,11 +1,20 @@
 import mysql.connector
 
-# Replace these variables with your actual database credentials
-host = "your_host"
-user = "your_username"
-password = "your_password"
-database = "your_database_name"
+host = "localhost"
+user = "calvin2"
+password = "12345678"
+database = "database_final_project_v1"
 
+# Database Connection
+connection = mysql.connector.connect(
+    host=host,
+    user=user,
+    password=password,
+    database=database
+)
 
-# the code below will be used to create all the fake data and insert them into the database
-
+cursor = connection.cursor()
+# select all resistration
+cursor.execute( "SELECT * FROM registration" )
+result = cursor.fetchall()
+print(result)

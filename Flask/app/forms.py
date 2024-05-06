@@ -31,3 +31,13 @@ class UserForm(FlaskForm):
     lname = StringField('Last Name', validators=[DataRequired(), Length(max=50)])
     account_type = SelectField('Account Type', choices=ACCOUNT_TYPE_CHOICES, validators=[DataRequired()])
 
+
+
+class CourseRegistrationForm(FlaskForm):
+    # user_id = StringField('Username', validators=[DataRequired()])
+    course_code = StringField('', validators=[DataRequired()])
+    submit = SubmitField('Register')
+
+class MembershipForm(FlaskForm):
+    course_code = StringField('', validators=[DataRequired()])
+    submit = SubmitField('Register')
