@@ -762,43 +762,92 @@ def add_user():
 @login_required
 @app.route('/retrieve/members/<course_code>', methods = ['GET', 'POST']) 
 def retrieve_members_by_course(course_code):
-    #check if the course exists
-    cursor = connection.cursor()
-    cursor.execute("SELECT * FROM course WHERE course_code = %s", (course_code,))
-    result = cursor.fetchone()
-    if not result:
-        flash('Course does not exist', 'danger')
-        return redirect(url_for('retrieve_members'))
-    
-    cursor = connection.cursor()
-    cursor.execute("SELECT registration.user_id, user.fname, user.lname FROM registration \
-                   JOIN user on registration.user_id  = user.user_id WHERE registration.course_code = %s", (course_code,))
-    students = cursor.fetchall()
+    try:
+   
+        #check if the course exists
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM course WHERE course_code = %s", (course_code,))
+        result = cursor.fetchone()
+        if not result:
+            flash('Course does not exist', 'danger')
+            return redirect(url_for('retrieve_members'))
+        
+        
+        cursor = connection.cursor()
+        cursor.execute("SELECT registration.user_id, user.fname, user.lname FROM registration \
+                    JOIN user on registration.user_id  = user.user_id WHERE registration.course_code = %s", (course_code,))
+        students = cursor.fetchall()
 
-    cursor.execute("SELECT teaches.user_id, user.fname, user.lname FROM teaches \
-                   JOIN user on teaches.user_id  = user.user_id WHERE teaches.course_code = %s", (course_code,))
-    lecturers = cursor.fetchall()
-    # print(students)
-    
-    if not students:
-        students = []
-    else:
-        students = [dict(zip(['student_id', 'fname', 'lname'], student)) for student in students]
-    if not lecturers:
-        lecturers = []
-    else:
-        lecturers = [dict(zip(['student_id', 'fname', 'lname'], lecturer)) for lecturer in lecturers]
+        cursor.execute("SELECT teaches.user_id, user.fname, user.lname FROM teaches \
+                    JOIN user on teaches.user_id  = user.user_id WHERE teaches.course_code = %s", (course_code,))
+        lecturers = cursor.fetchall()
+        # print(students)
+        
+        if not students:
+            students = []
+        else:
+            students = [dict(zip(['student_id', 'fname', 'lname'], student)) for student in students]
+        if not lecturers:
+            lecturers = []
+        else:
+            lecturers = [dict(zip(['student_id', 'fname', 'lname'], lecturer)) for lecturer in lecturers]
+        
+        cursor.close()
+        form = MembershipForm()
+        flash('Course retrieved successfully', 'success')
+        return render_template('retrieveMembers.html', students=students, lecturers=lecturers, course_code=course_code, form=form) 
+    except:
+        return render_template('retrieveMembers.html', students=students, lecturers=lecturers, course_code=course_code, form=form) 
 
-    cursor.close()
-    form = MembershipForm()
-    flash('Course retrieved successfully', 'success')
-    return render_template('retrieveMembers.html', students=students, lecturers=lecturers, course_code=course_code, form=form) 
 
+@login_required
+@app.route('/api/retrieve/members/<course_code>', methods = ['GET', 'POST']) 
+def retrieve_members_by_course_api(course_code):
+    # postman api request
+    try:
+        course_code = course_code.upper()
+
+        #check if the course exists
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM course WHERE course_code = %s", (course_code,))
+        result = cursor.fetchone()
+        if not result:
+            return jsonify({"message": "Course does not exist"}), 400
+        else:
+            cursor = connection.cursor()
+            cursor.execute("SELECT registration.user_id, user.fname, user.lname FROM registration \
+                        JOIN user on registration.user_id  = user.user_id WHERE registration.course_code = %s", (course_code,))
+            students = cursor.fetchall()
+
+            cursor.execute("SELECT teaches.user_id, user.fname, user.lname FROM teaches \
+                        JOIN user on teaches.user_id  = user.user_id WHERE teaches.course_code = %s", (course_code,))
+            lecturers = cursor.fetchall()
+            # print(students)
+            
+            if not students:
+                students = []
+            else:
+                students = [dict(zip(['student_id', 'fname', 'lname'], student)) for student in students]
+            if not lecturers:
+                lecturers = []
+            else:
+                lecturers = [dict(zip(['student_id', 'fname', 'lname'], lecturer)) for lecturer in lecturers]
+            
+            cursor.close()
+            return jsonify({"students": students, "lecturers": lecturers}), 200
+
+    except:
+        return jsonify({"message": "Invalid request"}), 400
+        # pass
 
 @login_required
 @app.route('/retrieve/members', methods = ['GET', 'POST'])
 def retrieve_members():
-    
+    # postman api request
+    # if 'course_code' in request.json:
+    #     course_code = request.json['course_code']
+
+    # form submission
     form  = MembershipForm()
     if form.validate_on_submit():
         # flash('Course retrieved successfully', 'success')
@@ -810,6 +859,20 @@ def retrieve_members():
 
 
 
+@app.route('/courses/min/registration/50', methods=['GET'])
+def courses_with_50_or_more_students():
+    cursor = connection.cursor(dictionary=True)
+    query = """
+        SELECT c.course_code, c.course_name
+        FROM Course c
+        JOIN Registration r ON c.course_code = r.course_code
+        GROUP BY c.course_code
+        HAVING COUNT(r.user_id) >= 2
+    """
+    cursor.execute(query)
+    courses_data = cursor.fetchall()
+    cursor.close()
+    return jsonify(courses_data)
 
 
 
