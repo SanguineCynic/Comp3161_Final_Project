@@ -67,10 +67,10 @@ def select_all(table_name):
 
 if __name__ == "__main__":
     """ Insert data into database """
-     # insert_users()
+    insert_users()
 
     """ Save data into sql file"""
-    # save_user_SQL()
+    save_user_SQL()
    
     """ Select data from database"""
     select_all('user')
