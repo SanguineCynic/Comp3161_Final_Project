@@ -141,6 +141,10 @@ table_creation_queries = [
         lecturer_id INT,
         student_id INT
     )
+    """,
+    """
+    INSERT INTO UserKey (admin_id, lecturer_id, student_id) VALUES (84630, 10034670, 620130490)
+    
     """
 ]
 
