@@ -681,38 +681,23 @@ def add_user():
             hashed_password = bcrypt.generate_password_hash(random_password).decode('utf-8')
             #query the user table for the student with the highest id
             try: 
+                ############ UPDATED ###############
                 cursor = connection.cursor()
                 cursor.execute("SELECT MAX(user_id) FROM user where account_type = %s", (account_type,))
                 result = cursor.fetchone()
                 
-                result2 = cursor.execute(f"SELECT {account_type}_id FROM UserKey")
+                result2 = cursor.execute(f"SELECT MAX({account_type}_id) FROM UserKey")
                 result2 = cursor.fetchone()
 
                 try:
-                    if result2 and not result:
-                        user_id = int(result2[0]) + 1
-                    elif result and not result2:
-                        user_id = int(result[0]) + 1
-                    elif result and result2:
-                        user_id = max(int(result[0]), int(result2[0])) + 1
-                    # else:
-                        if account_type == UserType.STUDENT.value:
-                            user_id =  620130490
-                        elif account_type == UserType.LECTURER.value:
-                            user_id =  10034670
-                        elif account_type == UserType.ADMIN.value:
-                            user_id =  84630
-                        
+                    user_id = max(int(result[0]), int(result2[0])) + 1
                 except:
-                    if account_type == UserType.STUDENT.value:
-                            user_id =  620130490
-                    elif account_type == UserType.LECTURER.value:
-                        user_id =  10034670
-                    elif account_type == UserType.ADMIN.value:
-                        user_id =  84630
+                    user_id = result2[0] + 1
                 
                 cursor.execute(f"UPDATE UserKey SET { account_type}_id = %s", (user_id,))
                 connection.commit()
+                ####################
+                
             except:
                 return jsonify({"message":"User not added"})
                 
@@ -754,32 +739,13 @@ def add_user():
                 cursor.execute("SELECT MAX(user_id) FROM user where account_type = %s", (account_type,))
                 result = cursor.fetchone()
                 
-                result2 = cursor.execute(f"SELECT {account_type}_id FROM UserKey")
+                result2 = cursor.execute(f"SELECT MAX({account_type}_id) FROM UserKey")
                 result2 = cursor.fetchone()
-                # print(result2)
-                
+
                 try:
-                    if result2 and not result:
-                        user_id = int(result2[0]) + 1
-                    elif result and not result2:
-                        user_id = int(result[0]) + 1
-                    elif result and result2:
-                        user_id = max(int(result[0]), int(result2[0])) + 1
-                    # else:
-                        if account_type == UserType.STUDENT.value:
-                            user_id =  620130490
-                        elif account_type == UserType.LECTURER.value:
-                            user_id =  10034670
-                        elif account_type == UserType.ADMIN.value:
-                            user_id =  84630
-                        
+                    user_id = max(int(result[0]), int(result2[0])) + 1
                 except:
-                    if account_type == UserType.STUDENT.value:
-                            user_id =  620130490
-                    elif account_type == UserType.LECTURER.value:
-                        user_id =  10034670
-                    elif account_type == UserType.ADMIN.value:
-                        user_id =  84630
+                    user_id = result2[0] + 1
                 
                 cursor.execute(f"UPDATE UserKey SET { account_type}_id = %s", (user_id,))
                 connection.commit()
@@ -792,8 +758,8 @@ def add_user():
                 cursor.close()
 
                 flash(f'User added successfully: user_id: {user_id}, password: {random_password}', 'success')
-                form.fname.data = ''
-                form.lname.data = ''
+                # form.fname.data = ''
+                # form.lname.data = ''
                 
             except Exception as e:
                 print(e)
