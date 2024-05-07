@@ -1,0 +1,88 @@
+<!-- viewCourse.html -->
+
+
+{% extends "base.html" %}
+
+{% block header %}
+
+{% if session['account_type'] == 'admin' %}
+{% include 'adminHeader.html' %}
+{% endif %}
+
+{%if session['account_type'] == 'lecturer' %}
+{% include 'lecturerHeader.html' %}
+{% endif %}
+
+{%if session['account_type'] == 'student' %}
+{% include 'studentHeader.html' %}
+{% endif %}
+
+{% endblock %}
+{% block main %}
+  <div class="container">
+    <div class="row">
+      <div class="col-md-8">
+        <div class="card">
+          <div class="card-body">
+            <h2>Course Name: Introduction to Computer Science</h2>
+            <p><strong>Course Code:</strong> COMP101</p>
+            <p><strong>Description:</strong> This course introduces students to the fundamentals of computer science.</p>
+
+            <h3>Sections</h3>
+            <ul>
+              <li>
+                <div class="card">
+                  <div class="card-body">
+                    <h4>Section 1: Introduction</h4>
+                    <p>This section covers basic concepts such as programming languages and algorithms.</p>
+                  </div>
+                </div>
+              </li>
+              <li>
+                <div class="card">
+                  <div class="card-body">
+                    <h4>Section 2: Data Structures</h4>
+                    <p>This section explores various data structures like arrays, linked lists, and trees.</p>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-body">
+            <h3>Calendar Events</h3>
+            <button class="btn btn-primary" id="toggleEvents">Toggle Events</button>
+            <div id="calendarEvents" style="display: none;">
+              <ul>
+                <li>
+                  <h4>Event 1: Lecture 1</h4>
+                  <p>This event is the first lecture of the course.</p>
+                </li>
+                <li>
+                  <h4>Event 2: Midterm Exam</h4>
+                  <p>This event is the midterm exam scheduled for next month.</p>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('toggleEvents').addEventListener('click', function() {
+      var eventsDiv = document.getElementById('calendarEvents');
+      if (eventsDiv.style.display === 'none') {
+        eventsDiv.style.display = 'block';
+      } else {
+        eventsDiv.style.display = 'none';
+      }
+    });
+  </script>
+{% endblock %}
+

@@ -30,7 +30,7 @@
         </ul>
         <ul class="navbar-nav">
           <li class="nav-item">
-            <a class="nav-link" href="#">Hello {{session['user_firstname']}}</a>
+            <a class="nav-link" href="#">{{session['account_type'].capitalize()}}: {{session['user_firstname']}}</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="{{ url_for('logout')}}">logout</a>

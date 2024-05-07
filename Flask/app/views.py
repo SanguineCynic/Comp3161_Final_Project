@@ -4,7 +4,8 @@ from datetime import datetime, timedelta
 from enum import Enum
 
 #Flask imports
-from app import app, login_manager
+from . import app
+from app import  login_manager
 from flask import render_template, request, redirect, url_for, flash, session, abort, jsonify
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.utils import secure_filename
@@ -318,50 +319,64 @@ def teach():
         return redirect(url_for('home'))
     return render_template('teach.html', form=form)
 
+def login_manager(username,password):
+    cursor = connection.cursor()
+    cursor.execute("SELECT * FROM user WHERE user_id = %s", (username,))
+    user_data = cursor.fetchone()
+    if user_data:
+        user_id, fname, lname, account_type, hashed_password = user_data
+        if username == str(user_id): # and bcrypt.check_password_hash(hashed_password, password):
+            user = load_user(user_id)
+            login_user(user)
+            session['user_id'] = user_id
+            session['user_firstname'] = fname
+            session['account_type'] = account_type
+
+            expiration_delta = app.config.get('JWT_EXPIRATION_DELTA', timedelta(hours=1))
+            expiration_time = datetime.utcnow() + expiration_delta
+
+            user_data = {
+                "user_id": str(user_id), 
+                "fname": fname,
+                "lname": lname,
+                "account_type": account_type,
+                'exp': expiration_time
+
+            }
+
+            token = jwt.encode( user_data, app.config['SECRET_KEY'], algorithm='HS256')
+            reponse = {
+                'token': token,
+                'user': user_data
+            }
+            return reponse
+        else:
+            return False
+    else:
+        return False
+
+
+    
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     #this section is for postman
     try:
         form = request.get_json()
-        if form:
+        if 'username' in form and 'password' in form:
             username = form['username']
             password = form['password']
-
-            cursor = connection.cursor()
-            cursor.execute("SELECT * FROM user WHERE user_id = %s", (username,))
-            user_data = cursor.fetchone()
-            if user_data:
-                user_id, fname, lname, account_type, hashed_password = user_data
-                if username == str(user_id) and bcrypt.check_password_hash(hashed_password, password):
-                    user = load_user(user_id)
-                    login_user(user)
-                    session['user_id'] = user_id
-                    session['user_firstname'] = fname
-                    session['account_type'] = account_type
-
-                    expiration_delta = app.config.get('JWT_EXPIRATION_DELTA', timedelta(hours=1))
-                    expiration_time = datetime.utcnow() + expiration_delta
-
-                    user_data = {
-                        "user_id": str(user_id), 
-                        "fname": fname,
-                        "lname": lname,
-                        "account_type": account_type,
-                        'exp': expiration_time
-
-                    }
-
-                    token = jwt.encode( user_data, app.config['SECRET_KEY'], algorithm='HS256')
-
-                    return jsonify({"message":"Login Successful", 'user': user_data, 'token': token}), 200
-                else:
-                    return jsonify({"message":"Invalid username or password"}), 400
+            logged_in = login_manager(username, password)
+            if logged_in:
+                return logged_in, 200
             else:
-                return jsonify({"message":"Invalid username or password"}), 400
+                return jsonify({"message": "Invalid username or password"}), 400
+        
+        return jsonify({"message": "Missing username or password"}), 400
+    
     #this section is for web
     except:
-        
         form= LoginForm()
+        # redirect to home page if already logged in
         try:
             if session['account_type']:
                 return redirect(url_for('home'))
@@ -371,23 +386,17 @@ def login():
         if request.method == 'POST' and form.validate_on_submit:
             username = request.form['username']
             password = request.form['password']
+            logged_in = login_manager(username, password)
+            if logged_in:
+                user_id = logged_in['user']['user_id']
+                user = load_user(user_id)
+                login_user(user)
+                session['user_firstname'] = logged_in['user']['fname']
+                session['account_type'] = logged_in['user']['account_type']
+                session['user_id'] = logged_in['user']['user_id']
 
-            cursor = connection.cursor()
-            cursor.execute("SELECT * FROM user WHERE user_id = %s", (username,))
-            user_data = cursor.fetchone()
-            if user_data:
-                user_id, fname, lname, account_type, hashed_password = user_data
-                if username == str(user_id) and bcrypt.check_password_hash(hashed_password, password):
-                    user = load_user(user_id)
-                    login_user(user)
-                    session['user_firstname'] = fname
-                    session['account_type'] = account_type
-                    session['user_id'] = user_id
-                
-                   
-                    
-                    if current_user.is_authenticated:
-                        return redirect(url_for("home"))
+                flash('You are now logged in', 'success')
+                return redirect(url_for("home"))
             else:
                 flash('Invalid username or password', 'danger')
         return render_template("login.html", form=form)
@@ -810,6 +819,8 @@ def retrieve_members_by_course(course_code):
         cursor.close()
         form = MembershipForm()
         flash('Course retrieved successfully', 'success')
+        if not lecturers and not students:
+            flash('there are no members in this course', 'success')
         return render_template('retrieveMembers.html', students=students, lecturers=lecturers, course_code=course_code, form=form) 
     except:
         return render_template('retrieveMembers.html', students=students, lecturers=lecturers, course_code=course_code, form=form) 
@@ -888,6 +899,8 @@ def courses_with_50_or_more_students():
     courses_data = cursor.fetchall()
     cursor.close()
     return jsonify(courses_data)
+
+
 # DISCUSSION FORUMS
 @app.route('/forums', methods=['GET', 'POST'])
 def manage_discussion_forums():
@@ -943,7 +956,12 @@ def manage_discussion_forums():
         cursor.execute("INSERT INTO DiscussionForum (name, description) VALUES (%s, %s)", (name, description))
         connection.commit()
         
+# this has not been tested
+@login_required
+@app.route('/course/<course_code>')
+def view_selected_course(course_code):
 
+    return render_template('viewCourse.html')
 
 
 
