@@ -687,8 +687,12 @@ def add_user():
                 
                 result2 = cursor.execute(f"SELECT {account_type}_id FROM UserKey")
                 result2 = cursor.fetchone()
-            
-                user_id = max(result[0], result2[0]) + 1
+
+                try:
+                    user_id = max(result[0], result2[0]) + 1
+                except:
+                    user_id = 1;
+                
                 cursor.execute(f"UPDATE UserKey SET { account_type}_id = %s", (user_id,))
                 # connection.commit()
             except:
@@ -812,15 +816,37 @@ def retrieve_members():
 
 
 # DISCUSSION FORUMS
-@app.route('/forums', methods=['GET'])
-def get_discussion_forums():
-    discussion_forums = DiscussionForum.query.all()
-    return jsonify([{
-        'forum_id': df.forum_id,
-        'course_id': df.course_id,
-        'title': df.title,
-        'description': df.description
-    } for df in discussion_forums])
+@app.route('/forums', methods=['GET', 'POST'])
+def manage_discussion_forums():
+    if request.method == 'GET':
+        # Retrieve all forums
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM DiscussionForum")
+        forums = cursor.fetchall()
+        return jsonify(forums)
+    elif request.method == 'POST':
+        # Extract data from the request
+        data = request.get_json()
+        
+        # Validate the data (add your validation logic here)
+        # For simplicity, this example assumes all fields are required and valid
+        name = data.get('name')
+        description = data.get('description')
+
+        if not name or not description:
+            return jsonify({"error": "Name and description are required"}), 400
+        
+        # Insert the new forum into the database
+        cursor = connection.cursor()
+        cursor.execute("INSERT INTO DiscussionForum (name, description) VALUES (%s, %s)", (name, description))
+        connection.commit()
+        
+        # Return the newly created forum
+        cursor.execute("SELECT * FROM DiscussionForum WHERE name = %s", (name,))
+        new_forum = cursor.fetchone()
+        return jsonify(new_forum), 201
+
+
 
 
 
