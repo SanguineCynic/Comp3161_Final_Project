@@ -1,42 +1,42 @@
 [
   {
     "user_id": 10034711,
-    "course_id": "ENGL579"
+    "course_code": "ENGL579"
   },
   {
     "user_id": 10034711,
-    "course_id": "LANG628"
+    "course_code": "LANG628"
   },
   {
     "user_id": 10034711,
-    "course_id": "PHYS713"
+    "course_code": "PHYS713"
   },
   {
     "user_id": 10034711,
-    "course_id": "HIST634"
+    "course_code": "HIST634"
   },
   {
     "user_id": 10034720,
-    "course_id": "PSYC439"
+    "course_code": "PSYC439"
   },
   {
     "user_id": 10034856,
-    "course_id": "SWEN925"
+    "course_code": "SWEN925"
   },
   {
     "user_id": 10034856,
-    "course_id": "ENGL220"
+    "course_code": "ENGL220"
   },
   {
     "user_id": 10034723,
-    "course_id": "SWEN540"
+    "course_code": "SWEN540"
   },
   {
     "user_id": 10034850,
-    "course_id": "PSYC297"
+    "course_code": "PSYC297"
   },
   {
     "user_id": 10034850,
-    "course_id": "LANG318"
+    "course_code": "LANG318"
   }
 ]

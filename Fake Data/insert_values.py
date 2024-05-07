@@ -1,4 +1,3 @@
-# connection to database
 import mysql.connector
 from json_maker import save_json, load_json
 from flask_bcrypt import Bcrypt
@@ -17,8 +16,6 @@ connection = mysql.connector.connect(
     password=password,
     database=database
 )
-
-
 
 
 # insert users
@@ -48,6 +45,41 @@ def insert_courses():
     connection.commit()
     cursor.close()
 
+# insert students
+def insert_students():
+    cursor = connection.cursor()
+    students_data = load_json('student.json')
+    for student_data in students_data:
+        # Use parameterized query to insert data
+        user_query = "INSERT INTO student (user_id, earned_creds, gpa) VALUES (%s, %s, %s)"
+        user_values = (student_data['user_id'], student_data['earned_creds'], student_data['gpa'])
+        cursor.execute(user_query, user_values)
+    connection.commit()
+    cursor.close()
+
+# insert registrations
+def insert_registrations():
+    cursor = connection.cursor()
+    registrations_data = load_json('registration.json')
+    for registration_data in registrations_data:
+        # Use parameterized query to insert data
+        user_query = "INSERT INTO registration (user_id, course_code, final_average) VALUES (%s, %s, %s)"
+        user_values = (registration_data['user_id'], registration_data['course_code'], registration_data['final_average'])
+        cursor.execute(user_query, user_values)
+    connection.commit()
+    cursor.close()
+
+# insert teaches
+def insert_teaches():
+    cursor = connection.cursor()
+    teaches_data = load_json('teaches.json')
+    for teach_data in teaches_data:
+        # Use parameterized query to insert data
+        user_query = "INSERT INTO teaches (user_id, course_code) VALUES (%s, %s)"
+        user_values = (teach_data['user_id'], teach_data['course_code'])
+        cursor.execute(user_query, user_values)
+    connection.commit()
+    cursor.close()
 
 def save_user_SQL():
     users = load_json('users.json')
@@ -86,8 +118,11 @@ def select_all(table_name):
 
 if __name__ == "__main__":
     """ Insert data into database """
-    insert_users()
+    # insert_users()
     # insert_courses()
+    # insert_students()
+    # insert_registrations()
+    insert_teaches()
 
     """ Save data into sql file"""
     # save_user_SQL()

@@ -41,7 +41,7 @@ for user_id in user_ids:
     for course_id in selected_courses:
         teaches.append({
             'user_id': user_id,
-            'course_id': course_id
+            'course_code': course_id
         })
 
 # Print Teaches list
