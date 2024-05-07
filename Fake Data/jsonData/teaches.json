@@ -1,1 +1,42 @@
-[{"user_id": 10034670, "course_id": "BIOL202"}, {"user_id": 10034670, "course_id": "MGMT585"}, {"user_id": 10034670, "course_id": "ECON656"}, {"user_id": 10034670, "course_id": "PSYC495"}, {"user_id": 10034672, "course_id": "MGMT208"}, {"user_id": 10034672, "course_id": "MGMT440"}, {"user_id": 10034672, "course_id": "ENGL130"}, {"user_id": 10034672, "course_id": "SWEN942"}, {"user_id": 10034672, "course_id": "ENGL843"}, {"user_id": 10034671, "course_id": "ENGL646"}]
+[
+  {
+    "user_id": 10034711,
+    "course_id": "ENGL579"
+  },
+  {
+    "user_id": 10034711,
+    "course_id": "LANG628"
+  },
+  {
+    "user_id": 10034711,
+    "course_id": "PHYS713"
+  },
+  {
+    "user_id": 10034711,
+    "course_id": "HIST634"
+  },
+  {
+    "user_id": 10034720,
+    "course_id": "PSYC439"
+  },
+  {
+    "user_id": 10034856,
+    "course_id": "SWEN925"
+  },
+  {
+    "user_id": 10034856,
+    "course_id": "ENGL220"
+  },
+  {
+    "user_id": 10034723,
+    "course_id": "SWEN540"
+  },
+  {
+    "user_id": 10034850,
+    "course_id": "PSYC297"
+  },
+  {
+    "user_id": 10034850,
+    "course_id": "LANG318"
+  }
+]

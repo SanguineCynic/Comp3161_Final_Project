@@ -146,12 +146,13 @@
 						"key": "Authorization",
 						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo4NDYzMSwiZm5hbWUiOiJDYWx2aW4xMSIsImxuYW1lIjoiU3RlcGhlbnNvbiIsImFjY291bnRfdHlwZSI6ImFkbWluIiwiZXhwIjoxNzE0OTczMjk0fQ.rWtnwOpC3TB4f0eAQcHKTW_b1aIkICVeVkwOQ1-zqSg",
 						"description": "admin",
-						"type": "text"
+						"type": "text",
+						"disabled": true
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"fname\": \"Calvin18\",\r\n    \"lname\": \"Stephenson\",\r\n    \"account_type\": \"student\"\r\n}",
+					"raw": "{\r\n    \"fname\": \"Calvin24\",\r\n    \"lname\": \"Stephenson\",\r\n    \"account_type\": \"student\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -186,7 +187,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"username\": \"10034676\",\r\n    \"password\": \"HKMYOcJ\"\r\n}   ",
+					"raw": "{\r\n    \"username\": \"84630\",\r\n    \"password\": \"eB.QO<u\"\r\n}   ",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -366,6 +367,37 @@
 						"min",
 						"registration",
 						"50"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "forums",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\":\"F1\",\r\n    \"description\":\"F1 description\",\r\n    \"course_code\":\"COMP111\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5000/forums",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"forums"
 					]
 				}
 			},

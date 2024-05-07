@@ -1,77 +1,752 @@
 [
   {
     "user_id": 620130490,
-    "earned_creds": 65,
-    "gpa": 1.34
+    "earned_creds": 50,
+    "gpa": 1.39
   },
   {
     "user_id": 620130491,
-    "earned_creds": 10,
-    "gpa": 2.49
+    "earned_creds": 117,
+    "gpa": 2.1
   },
   {
     "user_id": 620130492,
-    "earned_creds": 84,
-    "gpa": 1.29
+    "earned_creds": 94,
+    "gpa": 2.78
   },
   {
     "user_id": 620130493,
-    "earned_creds": 7,
-    "gpa": 1.2
+    "earned_creds": 63,
+    "gpa": 2
   },
   {
     "user_id": 620130494,
-    "earned_creds": 73,
-    "gpa": 1.82
+    "earned_creds": 78,
+    "gpa": 3.7
   },
   {
     "user_id": 620130495,
-    "earned_creds": 80,
-    "gpa": 1.13
+    "earned_creds": 8,
+    "gpa": 2.07
   },
   {
     "user_id": 620130496,
-    "earned_creds": 110,
-    "gpa": 2.38
+    "earned_creds": 77,
+    "gpa": 1.73
   },
   {
     "user_id": 620130497,
-    "earned_creds": 92,
-    "gpa": 3.4
+    "earned_creds": 106,
+    "gpa": 3.01
   },
   {
     "user_id": 620130498,
-    "earned_creds": 54,
-    "gpa": 1.9
+    "earned_creds": 68,
+    "gpa": 2.65
   },
   {
     "user_id": 620130499,
-    "earned_creds": 111,
-    "gpa": 2.48
+    "earned_creds": 67,
+    "gpa": 2
   },
   {
     "user_id": 620130500,
-    "earned_creds": 97,
-    "gpa": 2.71
+    "earned_creds": 79,
+    "gpa": 3.04
   },
   {
     "user_id": 620130501,
-    "earned_creds": 18,
-    "gpa": 3.21
+    "earned_creds": 52,
+    "gpa": 1.5
   },
   {
     "user_id": 620130502,
-    "earned_creds": 17,
-    "gpa": 2.27
+    "earned_creds": 60,
+    "gpa": 1.8
   },
   {
     "user_id": 620130503,
-    "earned_creds": 25,
-    "gpa": 3.3
+    "earned_creds": 22,
+    "gpa": 2.67
   },
   {
     "user_id": 620130504,
+    "earned_creds": 28,
+    "gpa": 2.85
+  },
+  {
+    "user_id": 620130505,
+    "earned_creds": 78,
+    "gpa": 3.78
+  },
+  {
+    "user_id": 620130506,
+    "earned_creds": 68,
+    "gpa": 2.74
+  },
+  {
+    "user_id": 620130507,
+    "earned_creds": 0,
+    "gpa": 2.09
+  },
+  {
+    "user_id": 620130508,
+    "earned_creds": 117,
+    "gpa": 1.48
+  },
+  {
+    "user_id": 620130509,
+    "earned_creds": 26,
+    "gpa": 2.28
+  },
+  {
+    "user_id": 620130510,
+    "earned_creds": 74,
+    "gpa": 2.08
+  },
+  {
+    "user_id": 620130511,
+    "earned_creds": 41,
+    "gpa": 1.3
+  },
+  {
+    "user_id": 620130512,
+    "earned_creds": 57,
+    "gpa": 3.25
+  },
+  {
+    "user_id": 620130513,
+    "earned_creds": 100,
+    "gpa": 2.74
+  },
+  {
+    "user_id": 620130514,
+    "earned_creds": 95,
+    "gpa": 3.06
+  },
+  {
+    "user_id": 620130515,
     "earned_creds": 101,
-    "gpa": 3.11
+    "gpa": 1.11
+  },
+  {
+    "user_id": 620130516,
+    "earned_creds": 84,
+    "gpa": 2.09
+  },
+  {
+    "user_id": 620130517,
+    "earned_creds": 117,
+    "gpa": 1.61
+  },
+  {
+    "user_id": 620130518,
+    "earned_creds": 75,
+    "gpa": 2.85
+  },
+  {
+    "user_id": 620130519,
+    "earned_creds": 7,
+    "gpa": 2.24
+  },
+  {
+    "user_id": 620130520,
+    "earned_creds": 54,
+    "gpa": 3.53
+  },
+  {
+    "user_id": 620130521,
+    "earned_creds": 112,
+    "gpa": 2.53
+  },
+  {
+    "user_id": 620130522,
+    "earned_creds": 55,
+    "gpa": 3.45
+  },
+  {
+    "user_id": 620130523,
+    "earned_creds": 113,
+    "gpa": 3.86
+  },
+  {
+    "user_id": 620130524,
+    "earned_creds": 82,
+    "gpa": 3.53
+  },
+  {
+    "user_id": 620130525,
+    "earned_creds": 39,
+    "gpa": 3.05
+  },
+  {
+    "user_id": 620130526,
+    "earned_creds": 27,
+    "gpa": 3.72
+  },
+  {
+    "user_id": 620130527,
+    "earned_creds": 41,
+    "gpa": 1
+  },
+  {
+    "user_id": 620130528,
+    "earned_creds": 31,
+    "gpa": 3.55
+  },
+  {
+    "user_id": 620130529,
+    "earned_creds": 91,
+    "gpa": 2.33
+  },
+  {
+    "user_id": 620130530,
+    "earned_creds": 54,
+    "gpa": 3.27
+  },
+  {
+    "user_id": 620130531,
+    "earned_creds": 48,
+    "gpa": 3.86
+  },
+  {
+    "user_id": 620130532,
+    "earned_creds": 79,
+    "gpa": 2.7
+  },
+  {
+    "user_id": 620130533,
+    "earned_creds": 58,
+    "gpa": 3.01
+  },
+  {
+    "user_id": 620130534,
+    "earned_creds": 0,
+    "gpa": 2.6
+  },
+  {
+    "user_id": 620130535,
+    "earned_creds": 64,
+    "gpa": 2.97
+  },
+  {
+    "user_id": 620130536,
+    "earned_creds": 63,
+    "gpa": 3.71
+  },
+  {
+    "user_id": 620130537,
+    "earned_creds": 92,
+    "gpa": 3.96
+  },
+  {
+    "user_id": 620130538,
+    "earned_creds": 92,
+    "gpa": 3.23
+  },
+  {
+    "user_id": 620130539,
+    "earned_creds": 68,
+    "gpa": 2.99
+  },
+  {
+    "user_id": 620130540,
+    "earned_creds": 118,
+    "gpa": 1.51
+  },
+  {
+    "user_id": 620130541,
+    "earned_creds": 82,
+    "gpa": 1.49
+  },
+  {
+    "user_id": 620130542,
+    "earned_creds": 6,
+    "gpa": 2.98
+  },
+  {
+    "user_id": 620130543,
+    "earned_creds": 109,
+    "gpa": 1.58
+  },
+  {
+    "user_id": 620130544,
+    "earned_creds": 75,
+    "gpa": 2.38
+  },
+  {
+    "user_id": 620130545,
+    "earned_creds": 8,
+    "gpa": 1.9
+  },
+  {
+    "user_id": 620130546,
+    "earned_creds": 52,
+    "gpa": 3.33
+  },
+  {
+    "user_id": 620130547,
+    "earned_creds": 50,
+    "gpa": 1.01
+  },
+  {
+    "user_id": 620130548,
+    "earned_creds": 100,
+    "gpa": 1.75
+  },
+  {
+    "user_id": 620130549,
+    "earned_creds": 59,
+    "gpa": 2.46
+  },
+  {
+    "user_id": 620130550,
+    "earned_creds": 84,
+    "gpa": 2.34
+  },
+  {
+    "user_id": 620130551,
+    "earned_creds": 73,
+    "gpa": 2.97
+  },
+  {
+    "user_id": 620130552,
+    "earned_creds": 64,
+    "gpa": 3.41
+  },
+  {
+    "user_id": 620130553,
+    "earned_creds": 48,
+    "gpa": 3.7
+  },
+  {
+    "user_id": 620130554,
+    "earned_creds": 41,
+    "gpa": 3.67
+  },
+  {
+    "user_id": 620130555,
+    "earned_creds": 95,
+    "gpa": 2.71
+  },
+  {
+    "user_id": 620130556,
+    "earned_creds": 23,
+    "gpa": 1.19
+  },
+  {
+    "user_id": 620130557,
+    "earned_creds": 76,
+    "gpa": 1.29
+  },
+  {
+    "user_id": 620130558,
+    "earned_creds": 39,
+    "gpa": 3.13
+  },
+  {
+    "user_id": 620130559,
+    "earned_creds": 79,
+    "gpa": 1.44
+  },
+  {
+    "user_id": 620130560,
+    "earned_creds": 52,
+    "gpa": 1.47
+  },
+  {
+    "user_id": 620130561,
+    "earned_creds": 42,
+    "gpa": 3.03
+  },
+  {
+    "user_id": 620130562,
+    "earned_creds": 115,
+    "gpa": 1.81
+  },
+  {
+    "user_id": 620130563,
+    "earned_creds": 50,
+    "gpa": 3.8
+  },
+  {
+    "user_id": 620130564,
+    "earned_creds": 11,
+    "gpa": 3.59
+  },
+  {
+    "user_id": 620130565,
+    "earned_creds": 24,
+    "gpa": 2.51
+  },
+  {
+    "user_id": 620130566,
+    "earned_creds": 83,
+    "gpa": 2.89
+  },
+  {
+    "user_id": 620130567,
+    "earned_creds": 23,
+    "gpa": 1.7
+  },
+  {
+    "user_id": 620130568,
+    "earned_creds": 47,
+    "gpa": 3.86
+  },
+  {
+    "user_id": 620130569,
+    "earned_creds": 3,
+    "gpa": 1.05
+  },
+  {
+    "user_id": 620130570,
+    "earned_creds": 56,
+    "gpa": 3.14
+  },
+  {
+    "user_id": 620130571,
+    "earned_creds": 100,
+    "gpa": 3.95
+  },
+  {
+    "user_id": 620130572,
+    "earned_creds": 105,
+    "gpa": 2.31
+  },
+  {
+    "user_id": 620130573,
+    "earned_creds": 34,
+    "gpa": 1.76
+  },
+  {
+    "user_id": 620130574,
+    "earned_creds": 51,
+    "gpa": 3.67
+  },
+  {
+    "user_id": 620130575,
+    "earned_creds": 95,
+    "gpa": 3.76
+  },
+  {
+    "user_id": 620130576,
+    "earned_creds": 28,
+    "gpa": 1.78
+  },
+  {
+    "user_id": 620130577,
+    "earned_creds": 64,
+    "gpa": 2.36
+  },
+  {
+    "user_id": 620130578,
+    "earned_creds": 33,
+    "gpa": 3.1
+  },
+  {
+    "user_id": 620130579,
+    "earned_creds": 89,
+    "gpa": 2.05
+  },
+  {
+    "user_id": 620130580,
+    "earned_creds": 75,
+    "gpa": 3.3
+  },
+  {
+    "user_id": 620130581,
+    "earned_creds": 19,
+    "gpa": 2.85
+  },
+  {
+    "user_id": 620130582,
+    "earned_creds": 100,
+    "gpa": 1.08
+  },
+  {
+    "user_id": 620130583,
+    "earned_creds": 13,
+    "gpa": 1.18
+  },
+  {
+    "user_id": 620130584,
+    "earned_creds": 97,
+    "gpa": 3.45
+  },
+  {
+    "user_id": 620130585,
+    "earned_creds": 102,
+    "gpa": 3.88
+  },
+  {
+    "user_id": 620130586,
+    "earned_creds": 32,
+    "gpa": 2.83
+  },
+  {
+    "user_id": 620130587,
+    "earned_creds": 79,
+    "gpa": 3.12
+  },
+  {
+    "user_id": 620130588,
+    "earned_creds": 10,
+    "gpa": 2.78
+  },
+  {
+    "user_id": 620130589,
+    "earned_creds": 3,
+    "gpa": 1.8
+  },
+  {
+    "user_id": 620130590,
+    "earned_creds": 54,
+    "gpa": 3.47
+  },
+  {
+    "user_id": 620130591,
+    "earned_creds": 74,
+    "gpa": 3.88
+  },
+  {
+    "user_id": 620130592,
+    "earned_creds": 55,
+    "gpa": 3.9
+  },
+  {
+    "user_id": 620130593,
+    "earned_creds": 21,
+    "gpa": 1.56
+  },
+  {
+    "user_id": 620130594,
+    "earned_creds": 35,
+    "gpa": 1.7
+  },
+  {
+    "user_id": 620130595,
+    "earned_creds": 53,
+    "gpa": 2.16
+  },
+  {
+    "user_id": 620130596,
+    "earned_creds": 56,
+    "gpa": 1.93
+  },
+  {
+    "user_id": 620130597,
+    "earned_creds": 112,
+    "gpa": 3.79
+  },
+  {
+    "user_id": 620130598,
+    "earned_creds": 100,
+    "gpa": 1.9
+  },
+  {
+    "user_id": 620130599,
+    "earned_creds": 115,
+    "gpa": 1.42
+  },
+  {
+    "user_id": 620130600,
+    "earned_creds": 18,
+    "gpa": 2.59
+  },
+  {
+    "user_id": 620130601,
+    "earned_creds": 113,
+    "gpa": 1.97
+  },
+  {
+    "user_id": 620130602,
+    "earned_creds": 35,
+    "gpa": 3.22
+  },
+  {
+    "user_id": 620130603,
+    "earned_creds": 47,
+    "gpa": 3.06
+  },
+  {
+    "user_id": 620130604,
+    "earned_creds": 49,
+    "gpa": 3.62
+  },
+  {
+    "user_id": 620130605,
+    "earned_creds": 27,
+    "gpa": 2.11
+  },
+  {
+    "user_id": 620130606,
+    "earned_creds": 73,
+    "gpa": 3.38
+  },
+  {
+    "user_id": 620130607,
+    "earned_creds": 81,
+    "gpa": 3.32
+  },
+  {
+    "user_id": 620130608,
+    "earned_creds": 93,
+    "gpa": 1.2
+  },
+  {
+    "user_id": 620130609,
+    "earned_creds": 26,
+    "gpa": 3.69
+  },
+  {
+    "user_id": 620130610,
+    "earned_creds": 40,
+    "gpa": 1
+  },
+  {
+    "user_id": 620130611,
+    "earned_creds": 10,
+    "gpa": 3.84
+  },
+  {
+    "user_id": 620130612,
+    "earned_creds": 54,
+    "gpa": 1.11
+  },
+  {
+    "user_id": 620130613,
+    "earned_creds": 98,
+    "gpa": 2.04
+  },
+  {
+    "user_id": 620130614,
+    "earned_creds": 47,
+    "gpa": 1.5
+  },
+  {
+    "user_id": 620130615,
+    "earned_creds": 114,
+    "gpa": 1.72
+  },
+  {
+    "user_id": 620130616,
+    "earned_creds": 13,
+    "gpa": 2.57
+  },
+  {
+    "user_id": 620130617,
+    "earned_creds": 47,
+    "gpa": 1.62
+  },
+  {
+    "user_id": 620130618,
+    "earned_creds": 101,
+    "gpa": 1.06
+  },
+  {
+    "user_id": 620130619,
+    "earned_creds": 50,
+    "gpa": 2.03
+  },
+  {
+    "user_id": 620130620,
+    "earned_creds": 60,
+    "gpa": 2.79
+  },
+  {
+    "user_id": 620130621,
+    "earned_creds": 57,
+    "gpa": 2.46
+  },
+  {
+    "user_id": 620130622,
+    "earned_creds": 34,
+    "gpa": 2.95
+  },
+  {
+    "user_id": 620130623,
+    "earned_creds": 106,
+    "gpa": 3.45
+  },
+  {
+    "user_id": 620130624,
+    "earned_creds": 116,
+    "gpa": 3.84
+  },
+  {
+    "user_id": 620130625,
+    "earned_creds": 47,
+    "gpa": 2.21
+  },
+  {
+    "user_id": 620130626,
+    "earned_creds": 70,
+    "gpa": 2.06
+  },
+  {
+    "user_id": 620130627,
+    "earned_creds": 6,
+    "gpa": 3.78
+  },
+  {
+    "user_id": 620130628,
+    "earned_creds": 5,
+    "gpa": 2.34
+  },
+  {
+    "user_id": 620130629,
+    "earned_creds": 24,
+    "gpa": 1.52
+  },
+  {
+    "user_id": 620130630,
+    "earned_creds": 9,
+    "gpa": 3.86
+  },
+  {
+    "user_id": 620130631,
+    "earned_creds": 65,
+    "gpa": 2.14
+  },
+  {
+    "user_id": 620130632,
+    "earned_creds": 100,
+    "gpa": 1.75
+  },
+  {
+    "user_id": 620130633,
+    "earned_creds": 78,
+    "gpa": 2.8
+  },
+  {
+    "user_id": 620130634,
+    "earned_creds": 0,
+    "gpa": 1.6
+  },
+  {
+    "user_id": 620130635,
+    "earned_creds": 31,
+    "gpa": 1.74
+  },
+  {
+    "user_id": 620130636,
+    "earned_creds": 57,
+    "gpa": 3.16
+  },
+  {
+    "user_id": 620130637,
+    "earned_creds": 25,
+    "gpa": 1.64
+  },
+  {
+    "user_id": 620130638,
+    "earned_creds": 51,
+    "gpa": 1.64
+  },
+  {
+    "user_id": 620130639,
+    "earned_creds": 58,
+    "gpa": 2.62
   }
 ]

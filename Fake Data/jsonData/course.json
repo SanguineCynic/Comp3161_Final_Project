@@ -1,42 +1,42 @@
 [
   {
-    "course_code": "ECON656",
-    "course_name": "Course Name ECON656"
+    "course_code": "PSYC439",
+    "course_name": "Course Name PSYC439"
   },
   {
-    "course_code": "ENGL130",
-    "course_name": "Course Name ENGL130"
+    "course_code": "PHYS713",
+    "course_name": "Course Name PHYS713"
   },
   {
-    "course_code": "MGMT208",
-    "course_name": "Course Name MGMT208"
+    "course_code": "HIST634",
+    "course_name": "Course Name HIST634"
   },
   {
-    "course_code": "MGMT585",
-    "course_name": "Course Name MGMT585"
+    "course_code": "ENGL220",
+    "course_name": "Course Name ENGL220"
   },
   {
-    "course_code": "PSYC495",
-    "course_name": "Course Name PSYC495"
+    "course_code": "SWEN540",
+    "course_name": "Course Name SWEN540"
   },
   {
-    "course_code": "ENGL646",
-    "course_name": "Course Name ENGL646"
+    "course_code": "PSYC297",
+    "course_name": "Course Name PSYC297"
   },
   {
-    "course_code": "BIOL202",
-    "course_name": "Course Name BIOL202"
+    "course_code": "LANG318",
+    "course_name": "Course Name LANG318"
   },
   {
-    "course_code": "MGMT440",
-    "course_name": "Course Name MGMT440"
+    "course_code": "ENGL579",
+    "course_name": "Course Name ENGL579"
   },
   {
-    "course_code": "ENGL843",
-    "course_name": "Course Name ENGL843"
+    "course_code": "LANG628",
+    "course_name": "Course Name LANG628"
   },
   {
-    "course_code": "SWEN942",
-    "course_name": "Course Name SWEN942"
+    "course_code": "SWEN925",
+    "course_name": "Course Name SWEN925"
   }
 ]

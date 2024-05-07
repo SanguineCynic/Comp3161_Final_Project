@@ -319,13 +319,13 @@ def teach():
         return redirect(url_for('home'))
     return render_template('teach.html', form=form)
 
-def login_manager(username,password):
+def my_login_manager(username,password):
     cursor = connection.cursor()
     cursor.execute("SELECT * FROM user WHERE user_id = %s", (username,))
     user_data = cursor.fetchone()
     if user_data:
         user_id, fname, lname, account_type, hashed_password = user_data
-        if username == str(user_id): # and bcrypt.check_password_hash(hashed_password, password):
+        if username == str(user_id) and bcrypt.check_password_hash(hashed_password, password):
             user = load_user(user_id)
             login_user(user)
             session['user_id'] = user_id
@@ -365,7 +365,7 @@ def login():
         if 'username' in form and 'password' in form:
             username = form['username']
             password = form['password']
-            logged_in = login_manager(username, password)
+            logged_in = my_login_manager(username, password)
             if logged_in:
                 return logged_in, 200
             else:
@@ -386,7 +386,7 @@ def login():
         if request.method == 'POST' and form.validate_on_submit:
             username = request.form['username']
             password = request.form['password']
-            logged_in = login_manager(username, password)
+            logged_in = my_login_manager(username, password)
             if logged_in:
                 user_id = logged_in['user']['user_id']
                 user = load_user(user_id)

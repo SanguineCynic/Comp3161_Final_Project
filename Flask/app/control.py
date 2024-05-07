@@ -33,6 +33,21 @@ connection = mysql.connector.connect(
     database=database
 )
 
+bcrypt = Bcrypt()
+
+class UserType(Enum):
+    STUDENT = 'student'
+    LECTURER = 'lecturer'
+    ADMIN = 'admin'
+
+def load_user(user_id):
+    cursor = connection.cursor()
+    cursor.execute("SELECT * FROM user WHERE user_id = %s", (user_id,))
+    user_data = cursor.fetchone()
+    if user_data:
+        user_id, fname, lname, account_type, password = user_data
+        return User(user_id,fname,UserType(account_type))
+    return None
 
 
 def login_manager(username,password):

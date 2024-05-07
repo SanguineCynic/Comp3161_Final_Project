@@ -1,6 +1,9 @@
 # connection to database
 import mysql.connector
 from json_maker import save_json, load_json
+from flask_bcrypt import Bcrypt
+
+bcrypt = Bcrypt()
 
 host = "localhost"
 user = "calvin2"
@@ -16,27 +19,20 @@ connection = mysql.connector.connect(
 )
 
 
+
+
 # insert users
 def insert_users():
     cursor = connection.cursor()
     users_data = load_json('users.json')
     for user_data in users_data:
+        # use bycrypt to encrypt 
+        hashed_password = bcrypt.generate_password_hash(user_data['password']).decode('utf-8')
+        user_data['password'] = hashed_password
         # Use parameterized query to insert data
         user_query = "INSERT INTO user (user_id, fname, lname, account_type, password) VALUES (%s, %s, %s, %s, %s)"
         user_values = (user_data['user_id'], user_data['fname'], user_data['lname'], user_data['type'], user_data['password'])
         cursor.execute(user_query, user_values)
-    connection.commit()
-    cursor.close()
-
-# insert courses
-def insert_courses():
-    cursor = connection.cursor()
-    courses_data = load_json('course.json')
-    for course_data in courses_data:
-        # Use parameterized query to insert data
-        query = "INSERT INTO course (course_code, course_name) VALUES (%s, %s)"
-        values = (course_data['course_code'], course_data['course_name'])
-        cursor.execute(query, values)
     connection.commit()
     cursor.close()
 
@@ -90,8 +86,8 @@ def select_all(table_name):
 
 if __name__ == "__main__":
     """ Insert data into database """
-    # insert_users()
-    insert_courses()
+    insert_users()
+    # insert_courses()
 
     """ Save data into sql file"""
     # save_user_SQL()
