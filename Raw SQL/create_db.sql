@@ -1,3 +1,7 @@
+DROP DATABASE IF EXISTS database_final_project_v1;
+CREATE DATABASE database_final_project_v1;
+USE database_final_project_v1;
+
 CREATE TABLE User (
     user_id INT PRIMARY KEY,
     fname VARCHAR(50) NOT NULL,
