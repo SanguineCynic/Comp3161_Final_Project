@@ -133,15 +133,14 @@ table_creation_queries = [
     )
     """,
     """
+    DROP TABLE IF EXISTS UserKey
+    """,
+    """
     CREATE TABLE IF NOT EXISTS UserKey (
         admin_id INT,
         lecturer_id INT,
-        student_id INT,
-        PRIMARY KEY (admin_id, lecturer_id, student_id)
-    ),
-
-    INSERT INTO UserKey VALUES ( 1, 1, 1 )
-
+        student_id INT
+    )
     """
 ]
 
@@ -187,7 +186,6 @@ if __name__ == "__main__":
     # uncomment if you want to drop all tables
     # drop_tables(host, user, password)
     pass
-
 
 
 

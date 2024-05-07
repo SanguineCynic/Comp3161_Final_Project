@@ -29,8 +29,8 @@ class UserType(Enum):
 
 # Database Configuration
 host = "localhost"
-user = "root"
-password = "Redfire3"
+user = "calvin2"
+password = "12345678"
 database = "database_final_project_v1"
 
 # Database Connection
@@ -689,12 +689,30 @@ def add_user():
                 result2 = cursor.fetchone()
 
                 try:
-                    user_id = max(result[0], result2[0]) + 1
+                    if result2 and not result:
+                        user_id = int(result2[0]) + 1
+                    elif result and not result2:
+                        user_id = int(result[0]) + 1
+                    elif result and result2:
+                        user_id = max(int(result[0]), int(result2[0])) + 1
+                    # else:
+                        if account_type == UserType.STUDENT.value:
+                            user_id =  620130490
+                        elif account_type == UserType.LECTURER.value:
+                            user_id =  10034670
+                        elif account_type == UserType.ADMIN.value:
+                            user_id =  84630
+                        
                 except:
-                    user_id = 1;
+                    if account_type == UserType.STUDENT.value:
+                            user_id =  620130490
+                    elif account_type == UserType.LECTURER.value:
+                        user_id =  10034670
+                    elif account_type == UserType.ADMIN.value:
+                        user_id =  84630
                 
                 cursor.execute(f"UPDATE UserKey SET { account_type}_id = %s", (user_id,))
-                # connection.commit()
+                connection.commit()
             except:
                 return jsonify({"message":"User not added"})
                 
@@ -738,10 +756,33 @@ def add_user():
                 
                 result2 = cursor.execute(f"SELECT {account_type}_id FROM UserKey")
                 result2 = cursor.fetchone()
-            
-                user_id = max(result[0], result2[0]) + 1
+                # print(result2)
+                
+                try:
+                    if result2 and not result:
+                        user_id = int(result2[0]) + 1
+                    elif result and not result2:
+                        user_id = int(result[0]) + 1
+                    elif result and result2:
+                        user_id = max(int(result[0]), int(result2[0])) + 1
+                    # else:
+                        if account_type == UserType.STUDENT.value:
+                            user_id =  620130490
+                        elif account_type == UserType.LECTURER.value:
+                            user_id =  10034670
+                        elif account_type == UserType.ADMIN.value:
+                            user_id =  84630
+                        
+                except:
+                    if account_type == UserType.STUDENT.value:
+                            user_id =  620130490
+                    elif account_type == UserType.LECTURER.value:
+                        user_id =  10034670
+                    elif account_type == UserType.ADMIN.value:
+                        user_id =  84630
+                
                 cursor.execute(f"UPDATE UserKey SET { account_type}_id = %s", (user_id,))
-                # connection.commit()
+                connection.commit()
             except:
                 flash('User not added', 'danger')
                 return render_template('addUser.html', form=form)
@@ -754,8 +795,9 @@ def add_user():
                 form.fname.data = ''
                 form.lname.data = ''
                 
-            except:
-                flash('User not added', 'danger')
+            except Exception as e:
+                print(e)
+                flash('User not added2', 'danger')
 
         # restrict access to non-admin users
         if session['account_type'] != UserType.ADMIN.value:
