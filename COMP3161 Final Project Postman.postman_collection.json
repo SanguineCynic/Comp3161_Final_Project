@@ -7,13 +7,27 @@
 	},
 	"item": [
 		{
-			"name": "http://127.0.0.1:5000/add/courses",
+			"name": "/add/courses",
 			"request": {
 				"method": "POST",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxMywiZm5hbWUiOiJDYWx2aW4xNiIsImxuYW1lIjoiU3RlcGhlbnNvbiIsImFjY291bnRfdHlwZSI6InN0dWRlbnQifQ.OLNQ6aKKkBn7i8_1qvhfzdTonp3YqIAnBmuSsG0Hd1E",
+						"description": "student authorization",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Authorization",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo4NDYzMSwiZm5hbWUiOiJDYWx2aW4xMSIsImxuYW1lIjoiU3RlcGhlbnNvbiIsImFjY291bnRfdHlwZSI6ImFkbWluIiwiZXhwIjoxNzE0OTg3MzMwfQ.lTIJ9H2U-QxPHxr8nXupz8a4NsbFm-EDnboAEHtNiJY",
+						"description": "admin authorization",
+						"type": "text"
+					}
+				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"course_code\":\"COMP222\",\r\n    \"course_name\": \"COMP222 Course\"\r\n}",
+					"raw": "{\r\n    \"course_code\":\"COMP445\",\r\n    \"course_name\": \"COMP445 Course\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -39,7 +53,7 @@
 			"response": []
 		},
 		{
-			"name": "http://127.0.0.1:5000/courses/api",
+			"name": "courses/api: ALL",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
 			},
@@ -56,7 +70,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://127.0.0.1:5000/courses",
+					"raw": "http://127.0.0.1:5000/courses/api",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -66,19 +80,20 @@
 					],
 					"port": "5000",
 					"path": [
-						"courses"
+						"courses",
+						"api"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "http://127.0.0.1:5000/courses/student/api/1",
+			"name": "/courses/student/api/1",
 			"request": {
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://127.0.0.1:5000/courses/student/api/1",
+					"raw": "http://127.0.0.1:5000/courses/student/api/13",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -91,14 +106,14 @@
 						"courses",
 						"student",
 						"api",
-						"1"
+						"13"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "http://127.0.0.1:5000/courses/lecturer/api/10034670",
+			"name": "/courses/lecturer/api/10034670",
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -123,13 +138,20 @@
 			"response": []
 		},
 		{
-			"name": "http://127.0.0.1:5000/add/user/api",
+			"name": "/add/user",
 			"request": {
 				"method": "POST",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo4NDYzMSwiZm5hbWUiOiJDYWx2aW4xMSIsImxuYW1lIjoiU3RlcGhlbnNvbiIsImFjY291bnRfdHlwZSI6ImFkbWluIiwiZXhwIjoxNzE0OTczMjk0fQ.rWtnwOpC3TB4f0eAQcHKTW_b1aIkICVeVkwOQ1-zqSg",
+						"description": "admin",
+						"type": "text"
+					}
+				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"fname\": \"Calvin17\",\r\n    \"lname\": \"Stephenson\",\r\n    \"account_type\": \"student\"\r\n}",
+					"raw": "{\r\n    \"fname\": \"Calvin18\",\r\n    \"lname\": \"Stephenson\",\r\n    \"account_type\": \"student\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -155,7 +177,7 @@
 			"response": []
 		},
 		{
-			"name": "http://127.0.0.1:5000/login",
+			"name": "/login",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
 			},
@@ -164,7 +186,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"username\": \"13\",\r\n    \"password\": \"2Sqqde3\"\r\n}",
+					"raw": "{\r\n    \"username\": \"10034676\",\r\n    \"password\": \"HKMYOcJ\"\r\n}   ",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -183,6 +205,167 @@
 					"port": "5000",
 					"path": [
 						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/register",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo4NDYzMSwiZm5hbWUiOiJDYWx2aW4xMSIsImxuYW1lIjoiU3RlcGhlbnNvbiIsImFjY291bnRfdHlwZSI6ImFkbWluIiwiZXhwIjoxNzE0OTczMjk0fQ.rWtnwOpC3TB4f0eAQcHKTW_b1aIkICVeVkwOQ1-zqSg",
+						"description": "admin",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Authorization",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxMDAzNDY3MywiZm5hbWUiOiJDYWx2aW4xOCIsImxuYW1lIjoiU3RlcGhlbnNvbiIsImFjY291bnRfdHlwZSI6ImxlY3R1cmVyIiwiZXhwIjoxNzE0OTc1ODYzfQ.U0UFw7UnkQTsFgAfeE_2VlTMPzLCGbmt6CRQTvRcGEA",
+						"description": "lecturer",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Authorization",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxMywiZm5hbWUiOiJDYWx2aW4xNiIsImxuYW1lIjoiU3RlcGhlbnNvbiIsImFjY291bnRfdHlwZSI6InN0dWRlbnQiLCJleHAiOjE3MTQ5ODc4NjZ9.sAaVvMQ12wjnZraxvObLW3f_o9OAcPwSG-r8RsrKzVo",
+						"description": "student",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"user_id\": \"13\",\r\n    \"course_code\": \"COMP111\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5000/register",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/logout",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/logout",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"logout"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/teach",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMTAwMzQ2NzYiLCJmbmFtZSI6IkNhbHZpbjE4IiwibG5hbWUiOiJTdGVwaGVuc29uIiwiYWNjb3VudF90eXBlIjoibGVjdHVyZXIiLCJleHAiOjE3MTQ5OTA3NDF9.ov7qcTpG5lnEr2nKtBw0ta0zqpbkRzt-q4o8x1kukso",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"user_id\":\"10034676\",\r\n    \"course_code\":\"TEST123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5000/teach",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"teach"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/api/retrieve/members/COMP111",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/api/retrieve/members/COMP111",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"retrieve",
+						"members",
+						"COMP111"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://127.0.0.1:5000/courses/min/registration/50",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/courses/min/registration/50",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"courses",
+						"min",
+						"registration",
+						"50"
 					]
 				}
 			},

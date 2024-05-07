@@ -4,7 +4,8 @@ from datetime import datetime, timedelta
 from enum import Enum
 
 #Flask imports
-from app import app, login_manager
+from . import app
+from app import  login_manager
 from flask import render_template, request, redirect, url_for, flash, session, abort, jsonify
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.utils import secure_filename
@@ -318,50 +319,64 @@ def teach():
         return redirect(url_for('home'))
     return render_template('teach.html', form=form)
 
+def login_manager(username,password):
+    cursor = connection.cursor()
+    cursor.execute("SELECT * FROM user WHERE user_id = %s", (username,))
+    user_data = cursor.fetchone()
+    if user_data:
+        user_id, fname, lname, account_type, hashed_password = user_data
+        if username == str(user_id): # and bcrypt.check_password_hash(hashed_password, password):
+            user = load_user(user_id)
+            login_user(user)
+            session['user_id'] = user_id
+            session['user_firstname'] = fname
+            session['account_type'] = account_type
+
+            expiration_delta = app.config.get('JWT_EXPIRATION_DELTA', timedelta(hours=1))
+            expiration_time = datetime.utcnow() + expiration_delta
+
+            user_data = {
+                "user_id": str(user_id), 
+                "fname": fname,
+                "lname": lname,
+                "account_type": account_type,
+                'exp': expiration_time
+
+            }
+
+            token = jwt.encode( user_data, app.config['SECRET_KEY'], algorithm='HS256')
+            reponse = {
+                'token': token,
+                'user': user_data
+            }
+            return reponse
+        else:
+            return False
+    else:
+        return False
+
+
+    
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     #this section is for postman
     try:
         form = request.get_json()
-        if form:
+        if 'username' in form and 'password' in form:
             username = form['username']
             password = form['password']
-
-            cursor = connection.cursor()
-            cursor.execute("SELECT * FROM user WHERE user_id = %s", (username,))
-            user_data = cursor.fetchone()
-            if user_data:
-                user_id, fname, lname, account_type, hashed_password = user_data
-                if username == str(user_id) and bcrypt.check_password_hash(hashed_password, password):
-                    user = load_user(user_id)
-                    login_user(user)
-                    session['user_id'] = user_id
-                    session['user_firstname'] = fname
-                    session['account_type'] = account_type
-
-                    expiration_delta = app.config.get('JWT_EXPIRATION_DELTA', timedelta(hours=1))
-                    expiration_time = datetime.utcnow() + expiration_delta
-
-                    user_data = {
-                        "user_id": str(user_id), 
-                        "fname": fname,
-                        "lname": lname,
-                        "account_type": account_type,
-                        'exp': expiration_time
-
-                    }
-
-                    token = jwt.encode( user_data, app.config['SECRET_KEY'], algorithm='HS256')
-
-                    return jsonify({"message":"Login Successful", 'user': user_data, 'token': token}), 200
-                else:
-                    return jsonify({"message":"Invalid username or password"}), 400
+            logged_in = login_manager(username, password)
+            if logged_in:
+                return logged_in, 200
             else:
-                return jsonify({"message":"Invalid username or password"}), 400
+                return jsonify({"message": "Invalid username or password"}), 400
+        
+        return jsonify({"message": "Missing username or password"}), 400
+    
     #this section is for web
     except:
-        
         form= LoginForm()
+        # redirect to home page if already logged in
         try:
             if session['account_type']:
                 return redirect(url_for('home'))
@@ -371,28 +386,21 @@ def login():
         if request.method == 'POST' and form.validate_on_submit:
             username = request.form['username']
             password = request.form['password']
+            logged_in = login_manager(username, password)
+            if logged_in:
+                user_id = logged_in['user']['user_id']
+                user = load_user(user_id)
+                login_user(user)
+                session['user_firstname'] = logged_in['user']['fname']
+                session['account_type'] = logged_in['user']['account_type']
+                session['user_id'] = logged_in['user']['user_id']
 
-            cursor = connection.cursor()
-            cursor.execute("SELECT * FROM user WHERE user_id = %s", (username,))
-            user_data = cursor.fetchone()
-            if user_data:
-                user_id, fname, lname, account_type, hashed_password = user_data
-                if username == str(user_id) and bcrypt.check_password_hash(hashed_password, password):
-                    user = load_user(user_id)
-                    login_user(user)
-                    session['user_firstname'] = fname
-                    session['account_type'] = account_type
-                    session['user_id'] = user_id
-                
-                   
-                    
-                    if current_user.is_authenticated:
-                        return redirect(url_for("home"))
+                flash('You are now logged in', 'success')
+                return redirect(url_for("home"))
             else:
                 flash('Invalid username or password', 'danger')
         return render_template("login.html", form=form)
     
-
 
 @app.route('/logout')
 @login_required
@@ -409,6 +417,7 @@ def logout():
 
 @app.route('/')
 def home():
+    # session.clear()
     try: 
         """Render website's home page."""
         if session['account_type'] == UserType.STUDENT.value:
@@ -426,14 +435,15 @@ def home():
 def about():
     """Render the website's about page."""
     try:
-        current_user = load_user(current_user.id)
-        return render_template('about.html', user=current_user)
+        # current_user = load_user(current_user.id)
+        return render_template('about.html', user=session['user_id'])
     except:
         # return render_template('about.html')
         pass
     # if current_user:
     #     return render_template('about.html', user=current_user)
     # else:
+    return render_template('about.html')
 
         
 @login_required
@@ -723,7 +733,7 @@ def add_user():
                 return redirect(url_for('home'))
         except:
             return redirect(url_for('home'))
-            # pass
+            pass
         form = UserForm()
         if form.validate_on_submit():
             fname = form.fname.data
@@ -750,7 +760,7 @@ def add_user():
                 cursor.execute(f"UPDATE UserKey SET { account_type}_id = %s", (user_id,))
                 connection.commit()
             except:
-                flash('User not added', 'danger')
+                flash('User not added1', 'danger')
                 return render_template('addUser.html', form=form)
             try:
                 cursor.execute("INSERT INTO user VALUES (%s, %s, %s, %s, %s)", (user_id, fname, lname, account_type, hashed_password))
@@ -767,7 +777,8 @@ def add_user():
 
         # restrict access to non-admin users
         if session['account_type'] != UserType.ADMIN.value:
-            return redirect(url_for('home'))
+            # return redirect(url_for('home'))
+            pass
         return render_template('addUser.html', form=form)
 
 
@@ -775,43 +786,94 @@ def add_user():
 @login_required
 @app.route('/retrieve/members/<course_code>', methods = ['GET', 'POST']) 
 def retrieve_members_by_course(course_code):
-    #check if the course exists
-    cursor = connection.cursor()
-    cursor.execute("SELECT * FROM course WHERE course_code = %s", (course_code,))
-    result = cursor.fetchone()
-    if not result:
-        flash('Course does not exist', 'danger')
-        return redirect(url_for('retrieve_members'))
-    
-    cursor = connection.cursor()
-    cursor.execute("SELECT registration.user_id, user.fname, user.lname FROM registration \
-                   JOIN user on registration.user_id  = user.user_id WHERE registration.course_code = %s", (course_code,))
-    students = cursor.fetchall()
+    try:
+   
+        #check if the course exists
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM course WHERE course_code = %s", (course_code,))
+        result = cursor.fetchone()
+        if not result:
+            flash('Course does not exist', 'danger')
+            return redirect(url_for('retrieve_members'))
+        
+        
+        cursor = connection.cursor()
+        cursor.execute("SELECT registration.user_id, user.fname, user.lname FROM registration \
+                    JOIN user on registration.user_id  = user.user_id WHERE registration.course_code = %s", (course_code,))
+        students = cursor.fetchall()
 
-    cursor.execute("SELECT teaches.user_id, user.fname, user.lname FROM teaches \
-                   JOIN user on teaches.user_id  = user.user_id WHERE teaches.course_code = %s", (course_code,))
-    lecturers = cursor.fetchall()
-    # print(students)
-    
-    if not students:
-        students = []
-    else:
-        students = [dict(zip(['student_id', 'fname', 'lname'], student)) for student in students]
-    if not lecturers:
-        lecturers = []
-    else:
-        lecturers = [dict(zip(['student_id', 'fname', 'lname'], lecturer)) for lecturer in lecturers]
+        cursor.execute("SELECT teaches.user_id, user.fname, user.lname FROM teaches \
+                    JOIN user on teaches.user_id  = user.user_id WHERE teaches.course_code = %s", (course_code,))
+        lecturers = cursor.fetchall()
+        # print(students)
+        
+        if not students:
+            students = []
+        else:
+            students = [dict(zip(['student_id', 'fname', 'lname'], student)) for student in students]
+        if not lecturers:
+            lecturers = []
+        else:
+            lecturers = [dict(zip(['student_id', 'fname', 'lname'], lecturer)) for lecturer in lecturers]
+        
+        cursor.close()
+        form = MembershipForm()
+        flash('Course retrieved successfully', 'success')
+        if not lecturers and not students:
+            flash('there are no members in this course', 'success')
+        return render_template('retrieveMembers.html', students=students, lecturers=lecturers, course_code=course_code, form=form) 
+    except:
+        return render_template('retrieveMembers.html', students=students, lecturers=lecturers, course_code=course_code, form=form) 
 
-    cursor.close()
-    form = MembershipForm()
-    flash('Course retrieved successfully', 'success')
-    return render_template('retrieveMembers.html', students=students, lecturers=lecturers, course_code=course_code, form=form) 
 
+@login_required
+@app.route('/api/retrieve/members/<course_code>', methods = ['GET', 'POST']) 
+def retrieve_members_by_course_api(course_code):
+    # postman api request
+    try:
+        course_code = course_code.upper()
+
+        #check if the course exists
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM course WHERE course_code = %s", (course_code,))
+        result = cursor.fetchone()
+        if not result:
+            return jsonify({"message": "Course does not exist"}), 400
+        else:
+            cursor = connection.cursor()
+            cursor.execute("SELECT registration.user_id, user.fname, user.lname FROM registration \
+                        JOIN user on registration.user_id  = user.user_id WHERE registration.course_code = %s", (course_code,))
+            students = cursor.fetchall()
+
+            cursor.execute("SELECT teaches.user_id, user.fname, user.lname FROM teaches \
+                        JOIN user on teaches.user_id  = user.user_id WHERE teaches.course_code = %s", (course_code,))
+            lecturers = cursor.fetchall()
+            # print(students)
+            
+            if not students:
+                students = []
+            else:
+                students = [dict(zip(['student_id', 'fname', 'lname'], student)) for student in students]
+            if not lecturers:
+                lecturers = []
+            else:
+                lecturers = [dict(zip(['student_id', 'fname', 'lname'], lecturer)) for lecturer in lecturers]
+            
+            cursor.close()
+            return jsonify({"students": students, "lecturers": lecturers}), 200
+
+    except:
+        return jsonify({"message": "Invalid request"}), 400
+        # pass
 
 @login_required
 @app.route('/retrieve/members', methods = ['GET', 'POST'])
 def retrieve_members():
-    
+    # postman api request
+    # if 'course_code' in request.json:
+    #     course_code = request.json['course_code']
+
+    # form submission
     form  = MembershipForm()
     if form.validate_on_submit():
         # flash('Course retrieved successfully', 'success')
@@ -821,6 +883,22 @@ def retrieve_members():
     lecturers = []
     return render_template('retrieveMembers.html', students=students, lecturers=lecturers, course_code="", form=form)
 
+
+
+@app.route('/courses/min/registration/50', methods=['GET'])
+def courses_with_50_or_more_students():
+    cursor = connection.cursor(dictionary=True)
+    query = """
+        SELECT c.course_code, c.course_name
+        FROM Course c
+        JOIN Registration r ON c.course_code = r.course_code
+        GROUP BY c.course_code
+        HAVING COUNT(r.user_id) >= 2
+    """
+    cursor.execute(query)
+    courses_data = cursor.fetchall()
+    cursor.close()
+    return jsonify(courses_data)
 
 
 # DISCUSSION FORUMS
@@ -878,7 +956,12 @@ def manage_discussion_forums():
         cursor.execute("INSERT INTO DiscussionForum (name, description) VALUES (%s, %s)", (name, description))
         connection.commit()
         
+# this has not been tested
+@login_required
+@app.route('/course/<course_code>')
+def view_selected_course(course_code):
 
+    return render_template('viewCourse.html')
 
 
 
@@ -957,3 +1040,4 @@ def add_header(response):
 def page_not_found(error):
     """Custom 404 page."""
     return render_template('404.html'), 404
+

@@ -1,10 +1,17 @@
 {% extends "base.html" %}
-
-{% if session['account_type'] == 'admin' %}
 {% block header %}
+{% if session['account_type'] == 'admin' %}
 {% include 'adminHeader.html' %}
-{% endblock %}
 {% endif %}
+{%if session['account_type'] == 'lecturer' %}
+{% include 'lecturerHeader.html' %}
+{% endif %}
+{%if session['account_type'] == 'student' %}
+{% include 'studentHeader.html' %}
+{% endif %}
+{% endblock %}
+
+
 
 
 
