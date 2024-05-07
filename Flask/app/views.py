@@ -393,7 +393,6 @@ def login():
         return render_template("login.html", form=form)
     
 
-
 @app.route('/logout')
 @login_required
 def logout():
@@ -409,6 +408,7 @@ def logout():
 
 @app.route('/')
 def home():
+    # session.clear()
     try: 
         """Render website's home page."""
         if session['account_type'] == UserType.STUDENT.value:
@@ -426,14 +426,15 @@ def home():
 def about():
     """Render the website's about page."""
     try:
-        current_user = load_user(current_user.id)
-        return render_template('about.html', user=current_user)
+        # current_user = load_user(current_user.id)
+        return render_template('about.html', user=session['user_id'])
     except:
         # return render_template('about.html')
         pass
     # if current_user:
     #     return render_template('about.html', user=current_user)
     # else:
+    return render_template('about.html')
 
         
 @login_required
@@ -686,8 +687,10 @@ def add_user():
                 
                 result2 = cursor.execute(f"SELECT {account_type}_id FROM UserKey")
                 result2 = cursor.fetchone()
-            
-                user_id = max(result[0], result2[0]) + 1
+                try:
+                    user_id = max(result[0], result2[0]) + 1
+                except:
+                    user_id = 1
                 cursor.execute(f"UPDATE UserKey SET { account_type}_id = %s", (user_id,))
                 # connection.commit()
             except:
@@ -715,7 +718,7 @@ def add_user():
                 return redirect(url_for('home'))
         except:
             return redirect(url_for('home'))
-            # pass
+            pass
         form = UserForm()
         if form.validate_on_submit():
             fname = form.fname.data
@@ -733,12 +736,16 @@ def add_user():
                 
                 result2 = cursor.execute(f"SELECT {account_type}_id FROM UserKey")
                 result2 = cursor.fetchone()
-            
-                user_id = max(result[0], result2[0]) + 1
+                user_id = 1
+                try:
+                    user_id = max(result[0], result2[0]) + 1
+                except:
+                    user_id = 1
+
                 cursor.execute(f"UPDATE UserKey SET { account_type}_id = %s", (user_id,))
-                # connection.commit()
+                connection.commit()
             except:
-                flash('User not added', 'danger')
+                flash('User not added1', 'danger')
                 return render_template('addUser.html', form=form)
             try:
                 cursor.execute("INSERT INTO user VALUES (%s, %s, %s, %s, %s)", (user_id, fname, lname, account_type, hashed_password))
@@ -750,11 +757,12 @@ def add_user():
                 form.lname.data = ''
                 
             except:
-                flash('User not added', 'danger')
+                flash('User not added2', 'danger')
 
         # restrict access to non-admin users
         if session['account_type'] != UserType.ADMIN.value:
-            return redirect(url_for('home'))
+            # return redirect(url_for('home'))
+            pass
         return render_template('addUser.html', form=form)
 
 
@@ -948,3 +956,4 @@ def add_header(response):
 def page_not_found(error):
     """Custom 404 page."""
     return render_template('404.html'), 404
+
