@@ -818,9 +818,9 @@ def retrieve_members():
 # DISCUSSION FORUMS
 @app.route('/forums', methods=['GET', 'POST'])
 def manage_discussion_forums():
+    cursor = connection.cursor()
     if request.method == 'GET':
         # Retrieve all forums
-        cursor = connection.cursor()
         cursor.execute("SELECT * FROM DiscussionForum")
         forums = cursor.fetchall()
         return jsonify(forums)
@@ -832,19 +832,44 @@ def manage_discussion_forums():
         # For simplicity, this example assumes all fields are required and valid
         name = data.get('name')
         description = data.get('description')
+        course_code = data.get('course_code')
 
-        if not name or not description:
-            return jsonify({"error": "Name and description are required"}), 400
+        cursor.execute("SELECT course_code from course")
+        courses = cursor.fetchall()
+        #Refine fetchall into simple list
+        courses = [course[0] for course in courses]
+
+        if not name or not description or not course_code:
+            return jsonify({"error": "Name, description and course code are required"}), 400
+        
+        if course_code.upper() in courses:
+            #calculate forumID
+            cursor.execute("SELECT MAX(forum_id) from DiscussionForum")
+            currentForum = cursor.fetchone()[0]
+            if not currentForum:
+                forum_id = 1
+            else:
+                forum_id = currentForum+1
+            print(currentForum)
+
+            cursor.execute("INSERT INTO DiscussionForum (forum_id, course_id, title, description) VALUES (%s,%s,%s,%s)",(forum_id,course_code.upper(),name,description))
+            connection.commit()
+            # Return the newly created forum
+            cursor.execute("SELECT * FROM DiscussionForum WHERE title = %s", (name,))
+            new_forum = cursor.fetchone()
+            return jsonify(new_forum), 201
+            return jsonify({"message":"Forum created successfully!"}), 200
+        else:
+            return jsonify({"error":"Course code not found"}), 404
+
+
+
         
         # Insert the new forum into the database
         cursor = connection.cursor()
         cursor.execute("INSERT INTO DiscussionForum (name, description) VALUES (%s, %s)", (name, description))
         connection.commit()
         
-        # Return the newly created forum
-        cursor.execute("SELECT * FROM DiscussionForum WHERE name = %s", (name,))
-        new_forum = cursor.fetchone()
-        return jsonify(new_forum), 201
 
 
 

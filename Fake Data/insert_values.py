@@ -94,10 +94,10 @@ if __name__ == "__main__":
     insert_courses()
 
     """ Save data into sql file"""
-    save_user_SQL()
+    # save_user_SQL()
    
     """ Select data from database"""
-    select_all('user')
+    # select_all('user')
     
 
 
