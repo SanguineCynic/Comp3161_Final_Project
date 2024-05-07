@@ -12,6 +12,8 @@ connection = mysql.connector.connect(
 )
 
 cursor = connection.cursor()
+cursor.execute(f"DROP DATABASE IF EXISTS {database}")
+cursor.execute(f"CREATE DATABASE {database}")
 cursor.execute(f"USE {database};")
 table_creation_queries = [
     """
