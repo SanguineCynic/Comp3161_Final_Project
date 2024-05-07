@@ -138,7 +138,10 @@ table_creation_queries = [
         lecturer_id INT,
         student_id INT,
         PRIMARY KEY (admin_id, lecturer_id, student_id)
-    )
+    ),
+
+    INSERT INTO UserKey VALUES ( 1, 1, 1 )
+
     """
 ]
 
