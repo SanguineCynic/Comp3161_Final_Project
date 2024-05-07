@@ -27,7 +27,30 @@ def insert_users():
         cursor.execute(user_query, user_values)
     connection.commit()
     cursor.close()
-    
+
+# insert courses
+def insert_courses():
+    cursor = connection.cursor()
+    courses_data = load_json('course.json')
+    for course_data in courses_data:
+        # Use parameterized query to insert data
+        query = "INSERT INTO course (course_code, course_name) VALUES (%s, %s)"
+        values = (course_data['course_code'], course_data['course_name'])
+        cursor.execute(query, values)
+    connection.commit()
+    cursor.close()
+
+# insert courses
+def insert_courses():
+    cursor = connection.cursor()
+    courses_data = load_json('course.json')
+    for course_data in courses_data:
+        # Use parameterized query to insert data
+        query = "INSERT INTO course (course_code, course_name) VALUES (%s, %s)"
+        values = (course_data['course_code'], course_data['course_name'])
+        cursor.execute(query, values)
+    connection.commit()
+    cursor.close()
 
 
 def save_user_SQL():
@@ -67,13 +90,14 @@ def select_all(table_name):
 
 if __name__ == "__main__":
     """ Insert data into database """
-     # insert_users()
+    # insert_users()
+    insert_courses()
 
     """ Save data into sql file"""
     # save_user_SQL()
    
     """ Select data from database"""
-    select_all('user')
+    # select_all('user')
     
 
 

@@ -1,22 +1,22 @@
-import os
+#Standard libraries
+import os, json, string, jwt
+from datetime import datetime, timedelta
+from enum import Enum
+
+#Flask imports
 from app import app, login_manager
 from flask import render_template, request, redirect, url_for, flash, session, abort, jsonify
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.utils import secure_filename
+from werkzeug.security import check_password_hash
 from app.forms import LoginForm, UploadForm, CourseForm, UserForm, CourseRegistrationForm, MembershipForm
 from flask import send_from_directory
 from flask_login import logout_user
-from datetime import datetime
-import secrets
-from werkzeug.security import check_password_hash
-import mysql.connector
-from enum import Enum
 from flask_bcrypt import Bcrypt
+
+#MySQL connection and related imports
 import secrets
-import string
-import json
-import jwt
-from datetime import datetime, timedelta
+import mysql.connector
 
 
 bcrypt = Bcrypt()
@@ -506,6 +506,7 @@ def get_courses():
     courses = cursor.fetchall()
     cursor.close()
     return courses
+
 # @login_required
 @app.route('/courses', methods = ['GET'])
 def view_courses():
@@ -687,12 +688,32 @@ def add_user():
                 
                 result2 = cursor.execute(f"SELECT {account_type}_id FROM UserKey")
                 result2 = cursor.fetchone()
+
                 try:
-                    user_id = max(result[0], result2[0]) + 1
+                    if result2 and not result:
+                        user_id = int(result2[0]) + 1
+                    elif result and not result2:
+                        user_id = int(result[0]) + 1
+                    elif result and result2:
+                        user_id = max(int(result[0]), int(result2[0])) + 1
+                    # else:
+                        if account_type == UserType.STUDENT.value:
+                            user_id =  620130490
+                        elif account_type == UserType.LECTURER.value:
+                            user_id =  10034670
+                        elif account_type == UserType.ADMIN.value:
+                            user_id =  84630
+                        
                 except:
-                    user_id = 1
+                    if account_type == UserType.STUDENT.value:
+                            user_id =  620130490
+                    elif account_type == UserType.LECTURER.value:
+                        user_id =  10034670
+                    elif account_type == UserType.ADMIN.value:
+                        user_id =  84630
+                
                 cursor.execute(f"UPDATE UserKey SET { account_type}_id = %s", (user_id,))
-                # connection.commit()
+                connection.commit()
             except:
                 return jsonify({"message":"User not added"})
                 
@@ -736,12 +757,31 @@ def add_user():
                 
                 result2 = cursor.execute(f"SELECT {account_type}_id FROM UserKey")
                 result2 = cursor.fetchone()
-                user_id = 1
+                # print(result2)
+                
                 try:
-                    user_id = max(result[0], result2[0]) + 1
+                    if result2 and not result:
+                        user_id = int(result2[0]) + 1
+                    elif result and not result2:
+                        user_id = int(result[0]) + 1
+                    elif result and result2:
+                        user_id = max(int(result[0]), int(result2[0])) + 1
+                    # else:
+                        if account_type == UserType.STUDENT.value:
+                            user_id =  620130490
+                        elif account_type == UserType.LECTURER.value:
+                            user_id =  10034670
+                        elif account_type == UserType.ADMIN.value:
+                            user_id =  84630
+                        
                 except:
-                    user_id = 1
-
+                    if account_type == UserType.STUDENT.value:
+                            user_id =  620130490
+                    elif account_type == UserType.LECTURER.value:
+                        user_id =  10034670
+                    elif account_type == UserType.ADMIN.value:
+                        user_id =  84630
+                
                 cursor.execute(f"UPDATE UserKey SET { account_type}_id = %s", (user_id,))
                 connection.commit()
             except:
@@ -756,7 +796,8 @@ def add_user():
                 form.fname.data = ''
                 form.lname.data = ''
                 
-            except:
+            except Exception as e:
+                print(e)
                 flash('User not added2', 'danger')
 
         # restrict access to non-admin users
@@ -881,11 +922,70 @@ def courses_with_50_or_more_students():
     courses_data = cursor.fetchall()
     cursor.close()
     return jsonify(courses_data)
+# DISCUSSION FORUMS
+@app.route('/forums', methods=['GET', 'POST'])
+def manage_discussion_forums():
+    cursor = connection.cursor()
+    if request.method == 'GET':
+        # Retrieve all forums
+        cursor.execute("SELECT * FROM DiscussionForum")
+        forums = cursor.fetchall()
+        return jsonify(forums)
+    elif request.method == 'POST':
+        # Extract data from the request
+        data = request.get_json()
+        
+        # Validate the data (add your validation logic here)
+        # For simplicity, this example assumes all fields are required and valid
+        name = data.get('name')
+        description = data.get('description')
+        course_code = data.get('course_code')
+
+        cursor.execute("SELECT course_code from course")
+        courses = cursor.fetchall()
+        #Refine fetchall into simple list
+        courses = [course[0] for course in courses]
+
+        if not name or not description or not course_code:
+            return jsonify({"error": "Name, description and course code are required"}), 400
+        
+        if course_code.upper() in courses:
+            #calculate forumID
+            cursor.execute("SELECT MAX(forum_id) from DiscussionForum")
+            currentForum = cursor.fetchone()[0]
+            if not currentForum:
+                forum_id = 1
+            else:
+                forum_id = currentForum+1
+            print(currentForum)
+
+            cursor.execute("INSERT INTO DiscussionForum (forum_id, course_id, title, description) VALUES (%s,%s,%s,%s)",(forum_id,course_code.upper(),name,description))
+            connection.commit()
+            # Return the newly created forum
+            cursor.execute("SELECT * FROM DiscussionForum WHERE title = %s", (name,))
+            new_forum = cursor.fetchone()
+            return jsonify(new_forum), 201
+            return jsonify({"message":"Forum created successfully!"}), 200
+        else:
+            return jsonify({"error":"Course code not found"}), 404
+
+
+
+        
+        # Insert the new forum into the database
+        cursor = connection.cursor()
+        cursor.execute("INSERT INTO DiscussionForum (name, description) VALUES (%s, %s)", (name, description))
+        connection.commit()
+        
 
 
 
 
 
+
+##########################################################
+# Functions for general functionality (helper functions) #
+##########################################################
 
 def generate_random_password(length=7):
     alphabet = string.ascii_letters + string.digits  # Include letters (both cases) and digits

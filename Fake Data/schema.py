@@ -15,7 +15,7 @@ cursor = connection.cursor()
 cursor.execute(f"USE {database};")
 table_creation_queries = [
     """
-    CREATE TABLE User (
+    CREATE TABLE IF NOT EXISTS User (
         user_id INT PRIMARY KEY,
         fname VARCHAR(50) NOT NULL,
         lname VARCHAR(50) NOT NULL,
@@ -24,13 +24,13 @@ table_creation_queries = [
     )
     """,
     """
-    CREATE TABLE Course (
+    CREATE TABLE IF NOT EXISTS Course (
         course_code VARCHAR(10) PRIMARY KEY,
         course_name VARCHAR(100) NOT NULL
     )
     """,
     """
-    CREATE TABLE Student (
+    CREATE TABLE IF NOT EXISTS Student (
         user_id INT PRIMARY KEY,
         earned_creds INT,
         gpa DECIMAL(3, 2),
@@ -38,7 +38,7 @@ table_creation_queries = [
     )
     """,
     """
-    CREATE TABLE Registration (
+    CREATE TABLE IF NOT EXISTS Registration (
         user_id INT,
         course_code VARCHAR(10),
         final_average DECIMAL(4, 2),
@@ -48,7 +48,7 @@ table_creation_queries = [
     )
     """,
     """
-    CREATE TABLE Teaches (
+    CREATE TABLE IF NOT EXISTS Teaches (
         user_id INT,
         course_code VARCHAR(10),
         PRIMARY KEY (user_id, course_code),
@@ -57,7 +57,7 @@ table_creation_queries = [
     )
     """,
     """
-    CREATE TABLE Section (
+    CREATE TABLE IF NOT EXISTS Section (
         section_id INT PRIMARY KEY,
         course_code VARCHAR(10),
         title VARCHAR(100),
@@ -66,7 +66,7 @@ table_creation_queries = [
     )
     """,
     """
-    CREATE TABLE Content (
+    CREATE TABLE IF NOT EXISTS Content (
         content_id INT PRIMARY KEY,
         section_id INT,
         title VARCHAR(100),
@@ -76,7 +76,7 @@ table_creation_queries = [
     )
     """,
     """
-    CREATE TABLE CalendarEvent (
+    CREATE TABLE IF NOT EXISTS CalendarEvent (
         event_id INT PRIMARY KEY,
         section_id INT,
         title VARCHAR(100),
@@ -89,7 +89,7 @@ table_creation_queries = [
     )
     """,
     """
-    CREATE TABLE Submission (
+    CREATE TABLE IF NOT EXISTS Submission (
         user_id INT,
         event_id INT,
         file_names JSON,
@@ -101,7 +101,7 @@ table_creation_queries = [
     )
     """,
     """
-    CREATE TABLE DiscussionForum (
+    CREATE TABLE IF NOT EXISTS DiscussionForum (
         forum_id INT PRIMARY KEY,
         course_id VARCHAR(10),
         title VARCHAR(100),
@@ -110,7 +110,7 @@ table_creation_queries = [
     )
     """,
     """
-    CREATE TABLE DiscussionThread (
+    CREATE TABLE IF NOT EXISTS DiscussionThread (
         thread_id INT PRIMARY KEY,
         forum_id INT,
         user_id INT,
@@ -121,7 +121,7 @@ table_creation_queries = [
     )
     """,
     """
-    CREATE TABLE Reply (
+    CREATE TABLE IF NOT EXISTS Reply (
         reply_id INT PRIMARY KEY,
         thread_id INT,
         user_id INT,
@@ -133,11 +133,13 @@ table_creation_queries = [
     )
     """,
     """
-    CREATE TABLE UserKey (
+    DROP TABLE IF EXISTS UserKey
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS UserKey (
         admin_id INT,
         lecturer_id INT,
-        student_id INT,
-        PRIMARY KEY (admin_id, lecturer_id, student_id)
+        student_id INT
     )
     """
 ]
@@ -184,7 +186,6 @@ if __name__ == "__main__":
     # uncomment if you want to drop all tables
     # drop_tables(host, user, password)
     pass
-
 
 
 
