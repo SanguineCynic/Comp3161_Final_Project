@@ -1,22 +1,22 @@
-import os
+#Standard libraries
+import os, json, string, jwt
+from datetime import datetime, timedelta
+from enum import Enum
+
+#Flask imports
 from app import app, login_manager
 from flask import render_template, request, redirect, url_for, flash, session, abort, jsonify
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.utils import secure_filename
+from werkzeug.security import check_password_hash
 from app.forms import LoginForm, UploadForm, CourseForm, UserForm, CourseRegistrationForm, MembershipForm
 from flask import send_from_directory
 from flask_login import logout_user
-from datetime import datetime
-import secrets
-from werkzeug.security import check_password_hash
-import mysql.connector
-from enum import Enum
 from flask_bcrypt import Bcrypt
+
+#MySQL connection and related imports
 import secrets
-import string
-import json
-import jwt
-from datetime import datetime, timedelta
+import mysql.connector
 
 
 bcrypt = Bcrypt()
@@ -29,8 +29,8 @@ class UserType(Enum):
 
 # Database Configuration
 host = "localhost"
-user = "calvin2"
-password = "12345678"
+user = "root"
+password = "Redfire3"
 database = "database_final_project_v1"
 
 # Database Connection
@@ -505,6 +505,7 @@ def get_courses():
     courses = cursor.fetchall()
     cursor.close()
     return courses
+
 # @login_required
 @app.route('/courses', methods = ['GET'])
 def view_courses():
@@ -810,11 +811,23 @@ def retrieve_members():
 
 
 
+# DISCUSSION FORUMS
+@app.route('/forums', methods=['GET'])
+def get_discussion_forums():
+    discussion_forums = DiscussionForum.query.all()
+    return jsonify([{
+        'forum_id': df.forum_id,
+        'course_id': df.course_id,
+        'title': df.title,
+        'description': df.description
+    } for df in discussion_forums])
 
 
 
 
-
+##########################################################
+# Functions for general functionality (helper functions) #
+##########################################################
 
 def generate_random_password(length=7):
     alphabet = string.ascii_letters + string.digits  # Include letters (both cases) and digits
