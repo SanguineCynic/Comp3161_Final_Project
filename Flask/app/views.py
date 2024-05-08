@@ -4,8 +4,7 @@ from datetime import datetime, timedelta
 from enum import Enum
 
 #Flask imports
-from . import app
-from app import  login_manager
+from app import app, login_manager
 from flask import render_template, request, redirect, url_for, flash, session, abort, jsonify
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.utils import secure_filename
@@ -1040,4 +1039,9 @@ def add_header(response):
 def page_not_found(error):
     """Custom 404 page."""
     return render_template('404.html'), 404
+
+
+@app.route('/course_container')
+def course_container():
+    return render_template('courseContainer.html', count=5, course_name = "<Course Name>")
 
