@@ -24,8 +24,7 @@ def insert_users():
     users_data = load_json('users.json')
     for user_data in users_data:
         # use bycrypt to encrypt 
-        hashed_password = bcrypt.generate_password_hash(user_data['password']).decode('utf-8')
-        user_data['password'] = hashed_password
+        user_data['password'] = bcrypt.generate_password_hash(user_data['password']).decode('utf-8')
         # Use parameterized query to insert data
         user_query = "INSERT INTO user (user_id, fname, lname, account_type, password) VALUES (%s, %s, %s, %s, %s)"
         user_values = (user_data['user_id'], user_data['fname'], user_data['lname'], user_data['type'], user_data['password'])
@@ -113,23 +112,27 @@ def select_all(table_name):
     return users
 
 
-
-
-
 if __name__ == "__main__":
     """ Insert data into database """
     # insert_users()
     # insert_courses()
     # insert_students()
     # insert_registrations()
-    insert_teaches()
+    # insert_teaches()
 
     """ Save data into sql file"""
     # save_user_SQL()
    
     """ Select data from database"""
     # select_all('user')
-    
+
+
+
+    # code to print the first user in registration table
+
+
+
+
 
 
 

@@ -1,52 +1,56 @@
-<!-- viewCourse.html -->
-
-
 {% extends "base.html" %}
 
 {% block header %}
+  {% if session['account_type'] == 'admin' %}
+    {% include 'adminHeader.html' %}
+  {% endif %}
 
-{% if session['account_type'] == 'admin' %}
-{% include 'adminHeader.html' %}
-{% endif %}
+  {% if session['account_type'] == 'lecturer' %}
+    {% include 'lecturerHeader.html' %}
+  {% endif %}
 
-{%if session['account_type'] == 'lecturer' %}
-{% include 'lecturerHeader.html' %}
-{% endif %}
-
-{%if session['account_type'] == 'student' %}
-{% include 'studentHeader.html' %}
-{% endif %}
-
+  {% if session['account_type'] == 'student' %}
+    {% include 'studentHeader.html' %}
+  {% endif %}
 {% endblock %}
+
 {% block main %}
-  <div class="container">
+  <div class="container mt-5">
     <div class="row">
       <div class="col-md-8">
         <div class="card">
           <div class="card-body">
-            <h2>Course Name: Introduction to Computer Science</h2>
-            <p><strong>Course Code:</strong> COMP101</p>
-            <p><strong>Description:</strong> This course introduces students to the fundamentals of computer science.</p>
+            <h2 class="card-title">Introduction to Computer Science</h2>
+            <h5 class="card-subtitle mb-2 text-muted">Course Code: COMP101</h5>
+            <p class="card-text">This course introduces students to the fundamentals of computer science.</p>
 
             <h3>Sections</h3>
-            <ul>
-              <li>
-                <div class="card">
-                  <div class="card-body">
-                    <h4>Section 1: Introduction</h4>
-                    <p>This section covers basic concepts such as programming languages and algorithms.</p>
+            <div class="accordion" id="sectionsAccordion">
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="section1Heading">
+                  <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#section1Collapse" aria-expanded="true" aria-controls="section1Collapse">
+                    Section 1: Introduction
+                  </button>
+                </h2>
+                <div id="section1Collapse" class="accordion-collapse collapse show" aria-labelledby="section1Heading" data-bs-parent="#sectionsAccordion">
+                  <div class="accordion-body">
+                    This section covers basic concepts such as programming languages and algorithms.
                   </div>
                 </div>
-              </li>
-              <li>
-                <div class="card">
-                  <div class="card-body">
-                    <h4>Section 2: Data Structures</h4>
-                    <p>This section explores various data structures like arrays, linked lists, and trees.</p>
+              </div>
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="section2Heading">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#section2Collapse" aria-expanded="false" aria-controls="section2Collapse">
+                    Section 2: Data Structures
+                  </button>
+                </h2>
+                <div id="section2Collapse" class="accordion-collapse collapse" aria-labelledby="section2Heading" data-bs-parent="#sectionsAccordion">
+                  <div class="accordion-body">
+                    This section explores various data structures like arrays, linked lists, and trees.
                   </div>
                 </div>
-              </li>
-            </ul>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -57,14 +61,14 @@
             <h3>Calendar Events</h3>
             <button class="btn btn-primary" id="toggleEvents">Toggle Events</button>
             <div id="calendarEvents" style="display: none;">
-              <ul>
-                <li>
-                  <h4>Event 1: Lecture 1</h4>
-                  <p>This event is the first lecture of the course.</p>
+              <ul class="list-group">
+                <li class="list-group-item">
+                  <h5 class="card-title">Event 1: Lecture 1</h5>
+                  <p class="card-text">This event is the first lecture of the course.</p>
                 </li>
-                <li>
-                  <h4>Event 2: Midterm Exam</h4>
-                  <p>This event is the midterm exam scheduled for next month.</p>
+                <li class="list-group-item">
+                  <h5 class="card-title">Event 2: Midterm Exam</h5>
+                  <p class="card-text">This event is the midterm exam scheduled for next month.</p>
                 </li>
               </ul>
             </div>
@@ -85,4 +89,3 @@
     });
   </script>
 {% endblock %}
-

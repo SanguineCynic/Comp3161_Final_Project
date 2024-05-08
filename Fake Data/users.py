@@ -27,10 +27,11 @@ def make_user (amount = [0]*len(user_index), type_= user_index, counter = 0):
             #exit with error message
             exit('Error: Type must be "lecturer", "student", or "admin"')
          
-        # Function to generate random passwords
+        # Function to generate random passwords with no special characters
         def generate_password():
+
             password_length = secrets.choice(range(7, 8))  # Random password length between 8 and 15 characters
-            characters = string.ascii_letters + string.digits + string.punctuation
+            characters = string.ascii_letters + string.digits
             return ''.join(secrets.choice(characters) for _ in range(password_length))
 
         # Generate a list of persons with first and last names, type, user ID, and password
@@ -46,7 +47,7 @@ def make_user (amount = [0]*len(user_index), type_= user_index, counter = 0):
 
 
 
-lecturer_amount,students_amount, admin_amount = 250,150,2
+lecturer_amount,students_amount, admin_amount = 40,1500,2
 amount_index = [lecturer_amount, students_amount, admin_amount]
 make_user(amount=amount_index)
 save_json(persons, 'users.json')
