@@ -16,7 +16,10 @@ def make_course(amount):
         course_title = f"Course Name {course_code}"
 
         # Add course to list
-        course_list.append({'course_code': course_code, 'course_name': course_title})
+        this_course = {'course_code': course_code, 'course_name': course_title}
+        if this_course not in course_list:
+            course_list.append(this_course)
+        
 
         # Exit loop if we have reached 210 courses
         set_check = set()
@@ -33,5 +36,5 @@ if __name__ == "__main__":
     #     print(course)
 
     # add the number of courses
-    num_courses = 10
+    num_courses = 200
     save_json(make_course(num_courses), 'course.json')
