@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block css %}{% endblock %}
+
+{% block main %}
+<h1>{{ course_name }} Container</h1>
+<br>
+<div class="p-5 mb-4 bg-light rounded-3 border">
+    {% for i in range(count) %}
+  <div class="container-fluid py-1">
+    <section class="border p-4 bg-white">Course Info</section>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
+
+{% block js %}{% endblock %}
