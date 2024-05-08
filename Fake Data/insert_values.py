@@ -125,14 +125,7 @@ if __name__ == "__main__":
    
     """ Select data from database"""
     # select_all('user')
-
-
-
-    # code to print the first user in registration table
-
-
-
-
+    
 
 
 
