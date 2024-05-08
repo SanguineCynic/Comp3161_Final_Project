@@ -75,6 +75,6 @@ if  __name__ == "__main__":
             print(f"{course_id}' occurs {occurrences} ")
 
 
-    # check_unique_course_codes()
+    check_unique_course_codes()
 
-# print (len(teaches))
+print (len(teaches))

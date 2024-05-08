@@ -32,8 +32,8 @@ def make_course(amount):
     return course_list
 
 if __name__ == "__main__":
-    # for course in make_course(10):
-    #     print(course)
+    for course in make_course(10):
+        print(course)
 
     # add the number of courses
     num_courses = 200

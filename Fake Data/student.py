@@ -18,9 +18,9 @@ def generate_random_values():
 
 if __name__ == '__main__':
     new_student_data = [{'user_id': student['user_id'], **generate_random_values()} for student in student_list]
-    # for student in new_student_data:
-    #     print(student)
-    # print(new_student_data)
+    for student in new_student_data:
+       print(student)
+    print(new_student_data)
     save_json(new_student_data, 'student.json')
 
 

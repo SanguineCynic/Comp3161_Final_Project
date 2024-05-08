@@ -38,8 +38,8 @@ json = save_json(registration, 'registration.json')
 
 if __name__ == "__main__":
     #Print all registrations
-    # for registration_entry in registration:
-    #     print(registration_entry)
+    for registration_entry in registration:
+        print(registration_entry)
 
     def debug ():
         # Count registrations per user ID
@@ -54,7 +54,7 @@ if __name__ == "__main__":
         # Print counts for each student registration 
         for user_id, count in user_id_counts.items():
             print(f"User ID: {user_id}, Registrations: {count}")
-    # debug()
+    debug()
 
   
     
