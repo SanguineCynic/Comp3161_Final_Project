@@ -942,7 +942,7 @@ def manage_discussion_forums():
             # Return the newly created forum
             cursor.execute("SELECT * FROM DiscussionForum WHERE title = %s", (name,))
             new_forum = cursor.fetchone()
-            return jsonify(new_forum), 201
+            # return jsonify(new_forum), 201
             return jsonify({"message":"Forum created successfully!"}), 200
         else:
             return jsonify({"error":"Course code not found"}), 404
@@ -963,6 +963,81 @@ def view_selected_course(course_code):
     return render_template('viewCourse.html')
 
 
+@app.route('/report/', methods=['GET'])
+def generate_report():
+    cursor = connection.cursor()
+
+    # Create views
+    viewQueries = ["""CREATE VIEW CoursesWith50OrMoreStudents AS
+SELECT course_code, COUNT(user_id) AS student_count
+FROM registration
+GROUP BY course_code
+HAVING COUNT(user_id) >= 50;
+""",
+                   
+                   """CREATE VIEW StudentsDoing5OrMoreCourses AS
+SELECT user_id, COUNT(DISTINCT course_code) AS course_count
+FROM registration
+GROUP BY user_id
+HAVING COUNT(DISTINCT course_code) >= 5;
+""",
+
+                   """CREATE VIEW Top10EnrolledCourses AS
+SELECT course_code, COUNT(*) AS enrollment_count
+FROM registration
+GROUP BY course_code
+ORDER BY enrollment_count DESC
+LIMIT 10;
+""",
+                    """CREATE VIEW LecturersTeachingThreeOrMoreCourses AS
+SELECT t.user_id, COUNT(t.course_code) AS course_count
+FROM teaches t
+GROUP BY t.user_id
+HAVING COUNT(t.course_code) >= 3;
+""",
+
+                    """CREATE VIEW Top10Students AS
+SELECT user_id, AVG(final_average) AS OverallAverage
+FROM registration
+GROUP BY user_id
+ORDER BY OverallAverage DESC
+LIMIT 10;
+"""]
+
+    # Executes correctly if views are not made. Ignores the views if they are created already. Views do not have an IF NOT EXISTS clause like tables do.
+    try:
+        for query in viewQueries:
+            print(query)
+            cursor.execute(query)
+        connection.commit()
+    except:
+        pass
+
+    # View selection
+    cursor.execute("SELECT * FROM CoursesWith50OrMoreStudents;")
+    CoursesOver50 = cursor.fetchall()
+    print(CoursesOver50)
+    print("5 or more courses:")
+    cursor.execute("SELECT * FROM StudentsDoing5OrMoreCourses;")
+    StudentsOver5 = cursor.fetchall()
+    print(StudentsOver5)
+    print("Top 10 courses:")
+    cursor.execute("SELECT * FROM Top10EnrolledCourses;")
+    Top10Courses = cursor.fetchall()
+    print(Top10Courses)
+    print("Teaching 3 or more:")
+    cursor.execute("SELECT * FROM LecturersTeachingThreeOrMoreCourses;")
+    Teaching3OrMore = cursor.fetchall()
+    print(Teaching3OrMore)
+    print("Top 10 students: ")
+    cursor.execute("SELECT * FROM Top10Students;")
+    Top10Students = cursor.fetchall()
+    print(Top10Students)
+    connection.commit()
+
+    # return jsonify({"message" : "Reports generated successfully"})
+    # For use when front-end is designed
+    return render_template('report.html', topstudents=Top10Students, lecturers=Teaching3OrMore, topenrollment=Top10Courses, studentsover5=StudentsOver5, coursesover50=CoursesOver50)
 
 
 
