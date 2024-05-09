@@ -1,20 +1,66 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 
-{% block main %}
-<div class="container mt-4" style="max-width: 500px;">
-<form action ="{{ url_for('login') }}" class="form-login m-auto" method="post">
-  {{ form.csrf_token }}
-  <h2>Please sign in</h2>
-  {% include 'flash_messages.html' %}
-  <div class="form-floating mb-3">
-    {{ form.username(class='form-control', placeholder="Enter your username") }}
-    {{ form.username.label() }}
-  </div>
-  <div class="form-floating">
-    {{ form.password(class='form-control', placeholder="Enter your password") }}
-    {{ form.password.label() }}
-  </div>
-  <button class="btn btn-lg btn-primary w-100 mt-3" type="submit">Sign in</button>
-</form>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-image: url('https://www.monash.edu/__data/assets/image/0011/3374543/WebCampaignBanner_2400x900.jpg');
+      background-size: cover;
+      background-position: center;
+    }
+    .login-card {
+      background-color: rgba(255, 255, 255, 0.5); /* Transparent white background for login card */
+      border-radius: 8px; 
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* Slight shadow */
+      padding: 20px;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+    }
+    .form-input {
+      width: 100%;
+      margin-bottom: 15px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+    .form-submit {
+      width: 100%;
+      background-color: #007bff; /* Button background color */
+      color: #fff;
+      border: none;
+      padding: 12px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="login-card">
+  <div>{% include 'flash_messages.html' %}</div>
+  
+  <h2>Login</h2>
+  <form action="{{ url_for('login') }}" method="post">
+    <input type="text" name="username" placeholder="Username" class="form-input"><br>
+    <input type="password" name="password" placeholder="Password" class="form-input"><br>
+    <button type="submit" class="form-submit">Sign in</button>
+  </form>
 </div>
-{% endblock %} 
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
