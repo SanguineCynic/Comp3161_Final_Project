@@ -2,4 +2,42 @@
 
 {% block header %}
  {% include 'studentHeader.html' %}
+
+ 
 {% endblock %}
+{% block main %}
+<h2 class="nabla-h2">Happy Coding ...</h2>
+<img src="https://mir-s3-cdn-cf.behance.net/project_modules/max_1200/c6fa0e81436849.5cffaef4c9203.gif" alt="">
+{% endblock %}
+
+{% block css %}
+<style>
+  img{
+    width: 60%;
+    border-radius: 40px;
+  }
+  .container{
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+  }
+  h2{
+    color: beige;
+    margin-bottom: 10px;
+  }
+
+
+
+.nabla-h2 {
+      font-family: "Nabla", system-ui;
+      font-optical-sizing: auto;
+      font-weight: 400;
+      font-style: normal;
+      font-variation-settings:
+        "EDPT" 100,
+        "EHLT" 12;
+    }
+</style>
+{% endblock %}
+

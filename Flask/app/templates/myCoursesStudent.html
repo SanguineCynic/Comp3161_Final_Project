@@ -74,9 +74,17 @@
         top: 0;
         left: 0;
         width: 100%;
-        max-height: 60%;
-        min-height: 60%;    
+       
+        height: 40%;    
         background-color: beige;
+        
+        width: 100%; /* Take the full width of the container */
+        height: 100%; /* Take the full height of the container */
+        background-image: url('https://t3.ftcdn.net/jpg/05/80/62/44/240_F_580624416_93sfmnpf81OGhQpkXu1jM62u0d7aTJHd.jpg');
+        /*background-image: url('https://t3.ftcdn.net/jpg/05/82/08/04/240_F_582080496_35F09I79Af8oEymqGxQ1VeOBJhaxPwg9.jpg');*/
+        background-size: cover; /* Cover the entire container */
+        background-position: center; /* Center the image */
+        
     }
     .bottom-half {
         position: absolute;
@@ -85,10 +93,13 @@
         width: 100%;
         background-color: rgb(255, 255, 255);
         padding: 20px;
+        height: 60%;
+
+        
     }
     .course-card {
         min-width: 300px;
-        min-height: 200px;
+        min-height: 250px;
     }
     .inner-container {
         min-width: 70vw;
@@ -102,6 +113,7 @@
     .card{
         box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
         border-radius: 8px;
+        padding: 20px;
     }
 </style>
 {% endblock %}
