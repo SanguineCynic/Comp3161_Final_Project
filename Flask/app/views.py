@@ -966,6 +966,7 @@ def view_selected_course(course_code):
 
 
 
+
 ##########################################################
 # Functions for general functionality (helper functions) #
 ##########################################################
