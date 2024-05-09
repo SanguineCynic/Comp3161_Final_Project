@@ -4,23 +4,67 @@
 {% include 'studentHeader.html' %}
 {% endblock %}
 
-
 {% block main %}
-
-<div class="container" style="max-width: 500px;">
-  {% include 'flash_messages.html' %}
-  <h2>Course Registration</h2>
-  <form action="{{ url_for('register') }}"  method="POST">
-    {{ form.csrf_token }}
-    
-    <div class="form-group mt-3">
-      {{ form.course_code.label(class="form-label") }}
-      {{ form.course_code(class="form-control", placeholder="Enter course code") }}
-    </div>
-    <div class= "mt-3" >
+<div class="container">
+  <div class="form-container">
+    {% include 'flash_messages.html' %}
+    <h2 class="text-center">Course Registration</h2>
+    <div class="form-group">
+    <form action="{{ url_for('register') }}" method="POST" class="mt-3">
+      {{ form.csrf_token }}
+      
+        {{ form.course_code.label(class="form-label") }}
+        {{ form.course_code(class="form-control", placeholder="Enter course code") }}
+      
+      <div class="text-center">
         <button type="submit" class="btn btn-primary">Register</button>
-    </div>
-  </form>
+      </div>
+    </form>
+  </div>
+  </div>
 </div>
 {% endblock %}
 
+{% block css %}
+<style>
+  .form-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  
+    background-color: rgba(255, 255, 255, 0.7);
+    height: 30vh; /* Full viewport height */
+    border-radius: 8px;
+    width: 23vw;
+ 
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 30px 60px -12px inset, rgba(0, 0, 0, 0.3) 0px 18px 36px -18px inset;
+    
+    
+    
+  }
+  .container{
+    width: 70vw;
+    height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    
+  }
+
+  .form-group {
+    width: 60%;
+  }
+  .btn{
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  h2{
+    color: rgb(74, 98, 151);
+  }
+
+  
+</style>
+{% endblock %}
