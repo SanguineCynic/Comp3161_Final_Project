@@ -24,7 +24,7 @@
                                 <div class="d-flex justify-content-end" >
                                     <!-- Dropdown menu -->
                                     <div >
-                                        <button style=" padding: 0px; background-color: transparent; border: none; width: 100%; " class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton{{ course.course_code }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" onclick="toggleDropdown('{{ course.course_code }}')">
+                                        <button style=" padding: 0px;  border: none; width: 100%; " class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton{{ course.course_code }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" onclick="toggleDropdown('{{ course.course_code }}')">
                                             <i style="color: rgb(147, 165, 221);" class="fas fa-bars"></i>
                                         </button>
                                         <div  class="dropdown-menu" id="dropdownMenu{{ course.course_code }}" aria-labelledby="dropdownMenuButton{{ course.course_code }}">
@@ -46,6 +46,15 @@
 
 {% block css %}
 <style>
+    .dropdown-toggle {
+        background-color: transparent;
+    }
+    .dropdown-toggle:hover{
+        background-color: rgba(179, 193, 213, 0.29)
+    }
+    
+
+
     .btn {
         width: 100px;
     }
