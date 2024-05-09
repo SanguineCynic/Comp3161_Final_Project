@@ -23,14 +23,17 @@
     <!-- set witdth to 200px -->
     {{ form.csrf_token }}
     <div class="form-group st " style="width: 400px;">
-        <label for="course_code">Course Code: </label>
+        
         
         {{ form.course_code(class='form-control', placeholder="Enter Course Code") }}
         
         <button type="submit" class="btn btn-primary">Apply Filter</button>
+        <a href="{{ url_for('retrieve_members') }} " class="btn btn-secondary">Remove Filter</a>
+        
+      
     </div>
 </form>
-
+{% if course_code %}
 <div class="container mt-4">
   <div class="section">
     <h3 >Courses for Lecturer in {{course_code}}</h3>
@@ -65,12 +68,21 @@
 
    
   </div>
-
+{% endif %}
 {% endblock %}
 
 {% block css%}
 
 <style>
+  .container{
+    width: 90vw;
+    padding-left: 0px;
+ 
+  }
+
+  .card-body{
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
+  }
   h3{
     color: beige;
     font-size: 15px;
@@ -85,6 +97,13 @@
     padding: 20px;
     border-radius: 8px;
     
+  }
+  button, a{
+    margin-right: 15px;
+    margin-top: 15px;
+  }
+  .form-control{
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
   }
 </style>
 
