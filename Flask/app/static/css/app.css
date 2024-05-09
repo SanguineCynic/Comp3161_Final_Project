@@ -3,3 +3,17 @@ body {
 }
 
 
+body {
+    margin: 0;
+    margin-top: 80px;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column   ;
+    /* height: 100vh; */
+    background-image: url('https://www.monash.edu/__data/assets/image/0011/3374543/WebCampaignBanner_2400x900.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+  }

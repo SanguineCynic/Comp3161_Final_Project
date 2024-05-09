@@ -1,6 +1,59 @@
 {% extends "base.html" %}
 
+{% block header %}
+{% if session['account_type'] %}
+
+{% if session['account_type'] == 'admin' %}
+{% include 'adminHeader.html' %}
+{% endif %}
+{% if session['account_type'] == 'lecturer' %}
+{% include 'lecturerHeader.html' %}
+{% endif %}
+{% if session['account_type'] == 'student' %}
+{% include 'studentHeader.html' %}
+{% endif %}
+{% endif %}
+
+{% endblock %}
 {% block main %}
 <h1 class="display-5 fw-bold">About</h1>
-<p>This webpage is about {{ name }}.</p>
+<p>This webpage is about a web design project for a course management system.</p>
+<hr>
+<h3>Authors:</h3>
+<ul>
+<li>Calvin Stephenson</li>
+<li>Pierre Mannix</li>
+<li>Jonathan</li>
+<li>Richard Barnett</li>
+</ul>
+{% endblock %}
+
+{% block css %}
+<style>
+    h1, p, hr,li{
+        color: rgb(80, 80, 98);
+        text-align: center;
+    } 
+    .container{
+        
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    hr{
+        color: white;
+        border: white 1px solid;
+        width: 40vw;
+    }
+    h3{
+        color: rgb(80, 80, 98);
+        margin-top: 7px;
+        text-align: center;
+
+    }
+    li{
+        list-style-type: none;
+        text-align: center;
+    }
+</style>
 {% endblock %}
