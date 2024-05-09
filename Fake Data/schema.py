@@ -60,7 +60,7 @@ table_creation_queries = [
     """,
     """
     CREATE TABLE IF NOT EXISTS Section (
-        section_id INT PRIMARY KEY,
+        section_id INT PRIMARY KEY AUTO_INCREMENT,
         course_code VARCHAR(10),
         title VARCHAR(100),
         description TEXT,
@@ -69,7 +69,7 @@ table_creation_queries = [
     """,
     """
     CREATE TABLE IF NOT EXISTS Content (
-        content_id INT PRIMARY KEY,
+        content_id INT PRIMARY KEY AUTO_INCREMENT,
         section_id INT,
         title VARCHAR(100),
         files_names JSON,

@@ -959,8 +959,118 @@ def manage_discussion_forums():
 @login_required
 @app.route('/course/<course_code>')
 def view_selected_course(course_code):
+    if session['account_type'] == UserType.STUDENT.value:
+        return render_template('viewCourseStudent.html', courseCode=course_code)
+    else:
+        if 'account_type' not in session:
+            return redirect(url_for('login'))
+        
+        sections = []
 
-    return render_template('viewCourse.html')
+        try:
+            query = "SELECT * FROM section WHERE course_code = %s" 
+            cursor = connection.cursor()
+            cursor.execute( query, (course_code,))
+            result = cursor.fetchall()
+            cursor.close()
+            for section in result:
+                sections.append({'section_id':section[0], 'course_code':section[1], 'title':section[2], 'description':section[3]})
+        except:
+            pass
+        return render_template('viewCourse.html', sections=sections, courseCode=course_code)
+    
+
+@login_required
+@app.route('/course/add_section/<course_code>', methods=['POST', 'GET'])
+def add_course_section(course_code):
+    if request.method == 'GET':
+        if session.get('account_type') == UserType.STUDENT.value:
+            return render_template('viewCourseStudent.html', courseCode=course_code)
+        else:
+            return render_template('addSection.html', courseCode=course_code) 
+    elif request.method == 'POST':
+        try:
+            if request.is_json:
+                form = request.get_json()
+            else:
+                form = request.form.to_dict()
+                
+            if 'title' in form and 'description' in form:
+                title = form['title']
+                description = form['description']
+                cursor = connection.cursor()
+                # Using parameterized query to prevent SQL injection
+                cursor.execute("INSERT INTO section (course_code, title, description) VALUES (%s, %s, %s)", (course_code, title, description))
+                connection.commit()
+                cursor.close()
+                # Render success template
+                return render_template('addContent.html', flash="Section Added Successfully", courseCode=course_code)
+        except Exception as e:
+            print(e)  # Log the exception for debugging
+            # Render error template
+            return render_template('viewCourse.html', message="An error occurred while adding the section", courseCode=course_code), 500
+    # Render default template for other cases
+    return render_template('viewCourse.html', message="Invalid request method", courseCode=course_code), 400
+
+
+
+def create_section(course_code, title, description):
+    cursor = connection.cursor()
+    cursor.execute(f"INSERT INTO section (course_code, title, description) VALUES ({course_code}, {title}, {description})")
+    user_data = cursor.fetchone()
+    if user_data:
+        user_id, fname, lname, account_type, hashed_password = user_data
+        if username == str(user_id) and bcrypt.check_password_hash(hashed_password, password):
+            user = load_user(user_id)
+            login_user(user)
+            session['user_id'] = user_id
+            session['user_firstname'] = fname
+            session['account_type'] = account_type
+
+
+    
+    """
+    try:
+        form = request.get_json()
+        if 'username' in form and 'password' in form:
+            username = form['username']
+            password = form['password']
+            logged_in = my_login_manager(username, password)
+            if logged_in:
+                return logged_in, 200
+            else:
+                return jsonify({"message": "Invalid username or password"}), 400
+        
+        return jsonify({"message": "Missing username or password"}), 400
+    
+    #this section is for web
+    except:
+        form= LoginForm()
+        # redirect to home page if already logged in
+        try:
+            if session['account_type']:
+                return redirect(url_for('home'))
+        except:
+            pass
+        
+        if request.method == 'POST' and form.validate_on_submit:
+            username = request.form['username']
+            password = request.form['password']
+            logged_in = my_login_manager(username, password)
+            if logged_in:
+                user_id = logged_in['user']['user_id']
+                user = load_user(user_id)
+                login_user(user)
+                session['user_firstname'] = logged_in['user']['fname']
+                session['account_type'] = logged_in['user']['account_type']
+                session['user_id'] = logged_in['user']['user_id']
+
+                flash('You are now logged in', 'success')
+                return redirect(url_for("home"))
+            else:
+                flash('Invalid username or password', 'danger')
+        return render_template("login.html", form=form)
+        """
 
 
 

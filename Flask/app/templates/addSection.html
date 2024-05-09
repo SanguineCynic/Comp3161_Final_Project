@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block header %}
+  {% if session['account_type'] == 'admin' %}
+    {% include 'adminHeader.html' %}
+  {% endif %}
+
+  {% if session['account_type'] == 'lecturer' %}
+    {% include 'lecturerHeader.html' %}
+  {% endif %}
+
+  {% if session['account_type'] == 'student' %}
+    {% include 'studentHeader.html' %}
+  {% endif %}
+{% endblock %}
+
+{% block main %}
+<div class="p-5 mb-4 bg-light rounded-3 border">
+  <div class="container-fluid py-3">
+    <h1 class="display-5 fw-bold">Create Content Section for {{ courseCode }}!</h1>
+    <p>Here you will create a section for your content to go into.</p>
+    <div>
+        <form action="{{ url_for('add_course_section', course_code=courseCode) }}" method="post">
+            <input type="text" name="title" placeholder="Title" class="form-input" required><br>
+            <input type="text" name="description" placeholder="Description" class="form-input" required><br>
+            <button type="submit" class="form-submit">Create Section</button>
+        </form>
+    </div>
+  </div>
+</div>
+<style>
+    .form-input {
+      width: 100%;
+      margin-bottom: 15px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+    .form-submit {
+      width: 100%;
+      background-color: #007bff; /* Button background color */
+      color: #fff;
+      border: none;
+      padding: 12px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+  </style>
+{% endblock %}
