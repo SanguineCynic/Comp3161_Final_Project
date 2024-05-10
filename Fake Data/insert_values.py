@@ -124,22 +124,7 @@ if __name__ == "__main__":
     save_user_SQL()
    
     """ Select data from database"""
-<<<<<<< HEAD
-    select_all('user')
-
-
-
-    # code to print the first user in registration table
-
-
-
-
-=======
     # select_all('user')
-    
->>>>>>> b67e233ec91af01e3c10836a0297a32b947995fe
-
-
 
         
 
