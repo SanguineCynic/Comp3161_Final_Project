@@ -22,7 +22,6 @@
           <div class="card-body">
             <div class="d-flex justify-content-between">
               <h2 class="card-subtitle mb-2 text-muted">{{ courseCode }}</h2>
-              <a href="{{url_for('add_course_section', course_code=courseCode)}}"><button type="button" class="btn btn-primary">Add Section</button></a>
             </div>
             {{ message }}
             {{ flash }}
@@ -62,7 +61,6 @@
                           {% endif %}
                           
                         {% endfor %}
-                        <a href="{{url_for('add_course_section_content', course_code=courseCode, section_id=section.section_id)}}"><button type="button" class="btn btn-primary">Add Content</button></a>
                       </div>
                     </div>
                 </div>

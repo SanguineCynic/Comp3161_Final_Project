@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block header %}
+  {% if session['account_type'] == 'admin' %}
+    {% include 'adminHeader.html' %}
+  {% endif %}
+
+  {% if session['account_type'] == 'lecturer' %}
+    {% include 'lecturerHeader.html' %}
+  {% endif %}
+
+  {% if session['account_type'] == 'student' %}
+    {% include 'studentHeader.html' %}
+  {% endif %}
+{% endblock %}
+
+{% block main %}
+<div class="p-5 mb-4 bg-light rounded-3 border">
+  <div class="container-fluid py-3">
+    <h1 class="display-5 fw-bold">Create Content for {{ courseCode }} in Section - Title: {{ section_title }}!</h1>
+    <p>Here you will create a content for your section.</p>
+    {% include 'flash_messages.html' %}
+    <div>
+        <form action="{{ url_for('add_course_section_content', course_code=courseCode, section_id=sectionId) }}" method="post" >
+            <input type="text" name="title" placeholder="Title" class="form-input" required><br>
+            <input type="text" name="fileName" placeholder="File Name" class="form-input"><br>
+            <textarea name="material" placeholder="Material" class="form-input" rows="4" cols="50"></textarea><br>
+            <button type="submit" class="form-submit" >Add Content</button>
+        </form>
+    </div>
+    <br><br><br>
+    <a class="dropdown-item" href="{{url_for('view_selected_course', course_code=courseCode)}}"><button type="button" class="btn btn-primary">Back to Course</button></a>
+  </div>
+</div>
+<style>
+    .form-input {
+      width: 100%;
+      margin-bottom: 15px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+    .form-submit {
+      width: 100%;
+      background-color: #007bff; /* Button background color */
+      color: #fff;
+      border: none;
+      padding: 12px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+  </style>
+{% endblock %}
