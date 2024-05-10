@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block main %}
+<!-- Courses with more than 50 students -->
+<div class="container scrollable-table">
+    <table class="table table-secondary">
+        
+        <thead>
+            <!-- Merged cell as a title -->
+        <tr>
+            <td colspan="2" class="text-center fw-bold">Courses With Over 50 Students</td>
+        </tr>
+            <tr>
+                <th>Course Code</th>
+                <th>Number of Registrants</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+            {% for course_code, count in coursesover50 %}
+                <tr>
+                    <td>{{ course_code }}</td>
+                    <td>{{ count }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Students Doing 5 or More Courses-->
+<div class="container scrollable-table">
+    <table class="table table-primary">
+        
+        <thead>
+            <!-- Merged cell as a title -->
+        <tr>
+            <td colspan="2" class="text-center fw-bold">Students Doing 5 or More Courses</td>
+        </tr>
+            <tr>
+                <th>Student ID</th>
+                <th>Number of Courses</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+            {% for id, course_count in studentsover5 %}
+                <tr>
+                    <td>{{ id }}</td>
+                    <td>{{ course_count }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Top 10 Most Enrolled Courses -->
+<div class="container">
+    <table class="table table-secondary">
+        
+        <thead>
+            <!-- Merged cell as a title -->
+        <tr>
+            <td colspan="2" class="text-center fw-bold">Top 10 Most Enrolled Courses</td>
+        </tr>
+            <tr>
+                <th>Course Code</th>
+                <th>Number of Registrants</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+            {% for id, count in topenrollment %}
+                <tr>
+                    <td>{{ id }}</td>
+                    <td>{{ count }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Lecturers With More than 3 Courses-->
+<div class="container scrollable-table">
+    <table class="table table-primary">
+        
+        <thead>
+            <!-- Merged cell as a title -->
+        <tr>
+            <td colspan="2" class="text-center fw-bold">Lecturers Teaching More Than 3 Courses</td>
+        </tr>
+            <tr>
+                <th>Lecturer ID</th>
+                <th>Number of Courses</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+            {% for id, course_count in lecturers %}
+                <tr>
+                    <td>{{ id }}</td>
+                    <td>{{ course_count }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Top 10 students -->
+<div class="container">
+    <table class="table table-secondary">
+        
+        <thead>
+            <!-- Merged cell as a title -->
+        <tr>
+            <td colspan="2" class="text-center fw-bold">Top 10 Students</td>
+        </tr>
+            <tr>
+                <th>ID Number</th>
+                <th>Score</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+            {% for id, score in topstudents %}
+                <tr>
+                    <td>{{ id }}</td>
+                    <td>{{ score }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+{% block js %}
+
+{% endblock %}
+

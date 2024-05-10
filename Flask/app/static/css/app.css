@@ -1,12 +1,23 @@
-body {
-    padding-top: 5rem;
+.scrollable-table {
+    width: 100%; /* Adjust the width as needed */
+    max-height: 400px; /* Adjust the maximum height as needed */
+    overflow-y: auto; /* Enable vertical scrolling */
+    resize: both; /* Make the container resizable */
 }
 
+tr{
+    border: 1px solid black;
+}
+
+table{
+    margin: 2% 0 2% 0;
+}
 
 body {
     margin: 0;
     margin-top: 80px;
     padding: 0;
+    padding-top: 5rem;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -17,3 +28,7 @@ body {
     background-position: center;
     background-attachment: fixed;
   }
+
+  .container{
+    width: 90vw;
+}
