@@ -1,5 +1,6 @@
 #Standard libraries
 import os, json, string, jwt
+from tracemalloc import start
 from datetime import datetime, timedelta
 from enum import Enum
 import time
@@ -1135,6 +1136,116 @@ def add_course_section_content(course_code, section_id):
     cursor.close()
     flash("Invalid request method", 'danger')
     return render_template('addContent.html', courseCode=course_code, sectionId=section_id, section_title=result[0]), 400
+
+
+
+    
+    """
+    try:
+        form = request.get_json()
+        if 'username' in form and 'password' in form:
+            username = form['username']
+            password = form['password']
+            logged_in = my_login_manager(username, password)
+            if logged_in:
+                return logged_in, 200
+            else:
+                return jsonify({"message": "Invalid username or password"}), 400
+        
+        return jsonify({"message": "Missing username or password"}), 400
+    
+    #this section is for web
+    except:
+        form= LoginForm()
+        # redirect to home page if already logged in
+        try:
+            if session['account_type']:
+                return redirect(url_for('home'))
+        except:
+            pass
+        
+        if request.method == 'POST' and form.validate_on_submit:
+            username = request.form['username']
+            password = request.form['password']
+            logged_in = my_login_manager(username, password)
+            if logged_in:
+                user_id = logged_in['user']['user_id']
+                user = load_user(user_id)
+                login_user(user)
+                session['user_firstname'] = logged_in['user']['fname']
+                session['account_type'] = logged_in['user']['account_type']
+                session['user_id'] = logged_in['user']['user_id']
+
+                flash('You are now logged in', 'success')
+                return redirect(url_for("home"))
+            else:
+                flash('Invalid username or password', 'danger')
+        return render_template("login.html", form=form)
+        """
+
+
+@login_required
+@app.route('/course/add_event/<course_code>/<int:section_id>', methods=['POST', 'GET'])
+def add_course_section_event(course_code, section_id):
+    if request.method == 'GET':
+        if session.get('account_type') == UserType.STUDENT.value:
+            return render_template('viewCourseStudent.html', courseCode=course_code)
+        else:
+            cursor = connection.cursor()
+            cursor.execute("SELECT title FROM calendarevent WHERE section_id = %s", (section_id,))
+            result = cursor.fetchone()
+            cursor.close()
+            return render_template('addEvent.html', courseCode=course_code, sectionId=section_id, section_title=result[0]) 
+    elif request.method == 'POST':
+        try:
+            if request.is_json:
+                form = request.get_json()
+            else:
+                form = request.form.to_dict()
+                
+            if 'title' in form:
+                title = form['title']
+                file_name = form['fileName']
+                description = form['description']
+                event_type = form['eventType']
+                start_date = form['startDate']
+                end_date = form['endDate']
+                cursor = connection.cursor()
+                cursor.execute("SELECT title FROM calendarevent WHERE section_id = %s", (section_id,))
+                result = cursor.fetchone()
+                if len(file_name) > 0 and not file_name.endswith('.pdf') and not file_name.endswith('.ppt'):
+                    flash("File Name must either be .pdf or .ppt", 'danger')
+                    return render_template('addEvent.html', courseCode=course_code, sectionId=section_id, section_title=result[0])
+                if len(file_name) > 0 and len(description) > 0:
+                    fileName = json.dumps({'text': file_name})
+                    cursor.execute("INSERT INTO calendarevent (section_id, title, file_names, description, event_type, start_date, end_date) VALUES (%s, %s, %s, %s, %s, %s, %s)", (section_id, title, fileName, description, event_type, start_date, end_date))
+                elif len(file_name) == 0 and len(description) == 0:
+                    flash("User must enter either a file name or course material", 'danger')
+                    return render_template('addEvent.html', courseCode=course_code, sectionId=section_id, section_title=result[0])
+                elif len(file_name) > 0 and len(description) == 0:
+                    fileName = json.dumps({'text': file_name})
+                    cursor.execute("INSERT INTO calendarevent (section_id, title, file_names, event_type, start_date, end_date) VALUES (%s, %s, %s, %s, %s, %s)", (section_id, title, fileName, event_type, start_date, end_date))
+                elif len(file_name) == 0 and len(description) > 0:
+                    fileName = json.dumps({'text': file_name})
+                    cursor.execute("INSERT INTO content (section_id, title, event_type, start_date, end_date) VALUES (%s, %s, %s, %s, %s)", (section_id, title, event_type, start_date, end_date))
+                connection.commit()
+                cursor.close()
+                flash("Content Added Successfully: " + title, 'success')
+                return render_template('addEvent.html', courseCode=course_code, sectionId=section_id, section_title=result[0])
+        except Exception as e:
+            print(e)
+            cursor = connection.cursor()
+            cursor.execute("SELECT title FROM calendarevent WHERE section_id = %s", (section_id,))
+            result = cursor.fetchone()
+            cursor.close()
+            flash("An error occurred while adding the content", 'danger')
+            return render_template('addEvent.html', courseCode=course_code, sectionId=section_id, section_title=result[0]), 500
+    cursor = connection.cursor()
+    cursor.execute("SELECT title FROM calendarevent WHERE section_id = %s", (section_id,))
+    result = cursor.fetchone()
+    cursor.close()
+    flash("Invalid request method", 'danger')
+    return render_template('addEvent.html', courseCode=course_code, sectionId=section_id, section_title=result[0]), 400
 
 
 

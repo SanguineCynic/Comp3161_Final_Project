@@ -72,8 +72,8 @@ table_creation_queries = [
         content_id INT PRIMARY KEY AUTO_INCREMENT,
         section_id INT,
         title VARCHAR(100),
-        files_names JSON DEFAULT 'NONE',
-        material TEXT DEFAULT 'NONE',
+        files_names JSON,
+        material TEXT,
         FOREIGN KEY (section_id) REFERENCES Section(section_id)
     )
     """,
