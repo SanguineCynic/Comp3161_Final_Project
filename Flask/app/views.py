@@ -968,7 +968,6 @@ def view_selected_course(course_code):
         
         sections = []
         content_dict = {}
-        content = []
 
         try:
             query = "SELECT * FROM section WHERE course_code = %s" 
@@ -983,6 +982,7 @@ def view_selected_course(course_code):
 
         try:
             for section in result:
+                content = []
                 query = "SELECT * FROM content WHERE section_id = %s" 
                 cursor = connection.cursor()
                 cursor.execute( query, (section[0],))
@@ -991,7 +991,6 @@ def view_selected_course(course_code):
                 for cont in result2:
                     content.append({'content_id':cont[0], 'section_id':cont[1], 'title':section[2], 'files_names':cont[3], 'material': cont[4]})
                 content_dict[section[0]] = content
-                print(content_dict)
         except:
             pass
         return render_template('viewCourse.html', sections=sections, content_dict=content_dict, courseCode=course_code)
@@ -1052,14 +1051,11 @@ def add_course_section_content(course_code, section_id):
             if 'title' in form:
                 title = form['title']
                 file_name = form['fileName']
-                print(file_name.endswith('.pdf'))
-                print(file_name.endswith('.ppt'))
-                print(len(file_name))
                 material = form['material']
                 cursor = connection.cursor()
                 cursor.execute("SELECT title FROM section WHERE section_id = %s", (section_id,))
                 result = cursor.fetchone()
-                if not file_name.endswith('.pdf') and not file_name.endswith('.ppt'):
+                if len(file_name) > 0 and not file_name.endswith('.pdf') and not file_name.endswith('.ppt'):
                     flash("File Name must either be .pdf or .ppt", 'danger')
                     return render_template('addContent.html', courseCode=course_code, sectionId=section_id, section_title=result[0])
                 if len(file_name) > 0 and len(material) > 0:
