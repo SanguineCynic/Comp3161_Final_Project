@@ -829,6 +829,47 @@ def api_add_user():
     # Handle GET request or invalid POST request
     return jsonify({"message": "Invalid request method or missing parameters"}), 400
 
+@login_required
+@app.route('/retrieve/members/<course_code>', methods = ['GET', 'POST']) 
+def retrieve_members_by_course(course_code):
+    try:
+
+        #check if the course exists
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM course WHERE course_code = %s", (course_code,))
+        result = cursor.fetchone()
+        if not result:
+            flash('Course does not exist', 'danger')
+            return redirect(url_for('retrieve_members'))
+
+
+        cursor = connection.cursor()
+        cursor.execute("SELECT registration.user_id, user.fname, user.lname FROM registration \
+                    JOIN user on registration.user_id  = user.user_id WHERE registration.course_code = %s", (course_code,))
+        students = cursor.fetchall()
+
+        cursor.execute("SELECT teaches.user_id, user.fname, user.lname FROM teaches \
+                    JOIN user on teaches.user_id  = user.user_id WHERE teaches.course_code = %s", (course_code,))
+        lecturers = cursor.fetchall()
+        # print(students)
+
+        if not students:
+            students = []
+        else:
+            students = [dict(zip(['student_id', 'fname', 'lname'], student)) for student in students]
+        if not lecturers:
+            lecturers = []
+        else:
+            lecturers = [dict(zip(['student_id', 'fname', 'lname'], lecturer)) for lecturer in lecturers]
+
+        cursor.close()
+        form = MembershipForm()
+        flash('Course retrieved successfully', 'success')
+        if not lecturers and not students:
+            flash('there are no members in this course', 'success')
+        return render_template('retrieveMembers.html', students=students, lecturers=lecturers, course_code=course_code, form=form) 
+    except:
+        return render_template('retrieveMembers.html', students=students, lecturers=lecturers, course_code=course_code, form=form) 
 
 @login_required
 @app.route('/api/retrieve/members/<course_code>', methods = ['GET', 'POST']) 
@@ -904,8 +945,10 @@ def courses_with_50_or_more_students():
     cursor.close()
     return jsonify(courses_data)
 
+#####################
+# DISCUSSION FORUMS #
+#####################
 
-# DISCUSSION FORUMS
 @app.route('/forums', methods=['GET', 'POST'])
 def manage_discussion_forums():
     cursor = connection.cursor()
@@ -1139,6 +1182,9 @@ def add_course_section_content(course_code, section_id):
         return render_template("login.html", form=form)
         """
 
+###########
+# REPORTS #
+###########
 
 @app.route('/report/', methods=['GET'])
 def generate_report():
@@ -1212,10 +1258,42 @@ LIMIT 10;
     print(Top10Students)
     connection.commit()
 
-    # return jsonify({"message" : "Reports generated successfully"})
-    # For use when front-end is designed
     return render_template('report.html', topstudents=Top10Students, lecturers=Teaching3OrMore, topenrollment=Top10Courses, studentsover5=StudentsOver5, coursesover50=CoursesOver50)
 
+@app.route('/report/courses_over_50', methods=['GET'])
+def courses_over_50():
+    cursor = connection.cursor()
+    cursor.execute("SELECT * FROM CoursesWith50OrMoreStudents;")
+    courses_over_50 = cursor.fetchall()
+    return jsonify(courses_over_50)
+
+@app.route('/report/students_over_5', methods=['GET'])
+def students_over_5():
+    cursor = connection.cursor()
+    cursor.execute("SELECT * FROM StudentsDoing5OrMoreCourses;")
+    students_over_5 = cursor.fetchall()
+    return jsonify(students_over_5)
+
+@app.route('/report/top_10_courses', methods=['GET'])
+def top_10_courses():
+    cursor = connection.cursor()
+    cursor.execute("SELECT * FROM Top10EnrolledCourses;")
+    top_10_courses = cursor.fetchall()
+    return jsonify(top_10_courses)
+
+@app.route('/report/lecturers_teaching_three_or_more', methods=['GET'])
+def lecturers_teaching_three_or_more():
+    cursor = connection.cursor()
+    cursor.execute("SELECT * FROM LecturersTeachingThreeOrMoreCourses;")
+    lecturers_teaching_three_or_more = cursor.fetchall()
+    return jsonify(lecturers_teaching_three_or_more)
+
+@app.route('/report/top_10_students', methods=['GET'])
+def top_10_students():
+    cursor = connection.cursor()
+    cursor.execute("SELECT * FROM Top10Students;")
+    top_10_students = cursor.fetchall()
+    return jsonify(top_10_students)
 
 
 
