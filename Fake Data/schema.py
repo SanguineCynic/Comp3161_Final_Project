@@ -79,7 +79,7 @@ table_creation_queries = [
     """,
     """
     CREATE TABLE IF NOT EXISTS CalendarEvent (
-        event_id INT PRIMARY KEY,
+        event_id INT PRIMARY KEY AUTO_INCREMENT,
         section_id INT,
         title VARCHAR(100),
         file_names JSON,
