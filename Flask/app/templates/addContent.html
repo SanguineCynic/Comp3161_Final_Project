@@ -21,11 +21,11 @@
     <p>Here you will create a content for your section.</p>
     {% include 'flash_messages.html' %}
     <div>
-        <form action="{{ url_for('add_course_section_content', course_code=courseCode, section_id=sectionId) }}" method="post">
+        <form action="{{ url_for('add_course_section_content', course_code=courseCode, section_id=sectionId) }}" method="post" >
             <input type="text" name="title" placeholder="Title" class="form-input" required><br>
             <input type="text" name="fileName" placeholder="File Name" class="form-input"><br>
             <textarea name="material" placeholder="Material" class="form-input" rows="4" cols="50"></textarea><br>
-            <button type="submit" class="form-submit">Add Content</button>
+            <button type="submit" class="form-submit" >Add Content</button>
         </form>
     </div>
     <br><br><br>

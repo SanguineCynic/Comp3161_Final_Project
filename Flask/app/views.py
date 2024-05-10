@@ -1060,7 +1060,7 @@ def add_course_section_content(course_code, section_id):
                     return render_template('addContent.html', courseCode=course_code, sectionId=section_id, section_title=result[0])
                 if len(file_name) > 0 and len(material) > 0:
                     fileName = json.dumps({'text': file_name})
-                    cursor.execute("INSERT INTO content (section_id, title, files_names, material) VALUES (%s, %s, %s)", (section_id, title, fileName, material))
+                    cursor.execute("INSERT INTO content (section_id, title, files_names, material) VALUES (%s,%s, %s, %s)", (section_id, title, fileName, material))
                 elif len(file_name) == 0 and len(material) == 0:
                     flash("User must enter either a file name or course material", 'danger')
                     return render_template('addContent.html', courseCode=course_code, sectionId=section_id, section_title=result[0])
