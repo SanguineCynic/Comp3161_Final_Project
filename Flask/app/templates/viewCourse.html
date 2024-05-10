@@ -26,6 +26,12 @@
             </div>
             {{ message }}
             {{ flash }}
+            <div class="d-flex justify-content-between">
+              <h2 class="card-subtitle mb-2 text-muted">{{ courseCode }}</h2>
+              <a href="{{url_for('add_course_section', course_code=courseCode)}}"><button type="button" class="btn btn-primary">Add Section</button></a>
+            </div>
+            {{ message }}
+            {{ flash }}
             <h3>Sections</h3>
             {% if not sections %}
               <p>There is no content for this Course</p>
@@ -70,7 +76,10 @@
                     </div>
                 </div>
                 <br>
+                <br>
               </div>
+              {% endfor %}
+            {% endif %}
               {% endfor %}
             {% endif %}
           </div>
@@ -84,6 +93,7 @@
             <button class="btn btn-primary" id="toggleEvents">Toggle Events</button>
             <a class="btn btn-secondary " href="{{url_for('discussion_forums', course_code=courseCode)}}" target="_blank">Forum Discussions</a>
             <div id="calendarEvents" style="display: none;">
+              <br>
               <br>
               <ul class="list-group">
                 <li class="list-group-item">
@@ -118,6 +128,15 @@
 <style>
 .container {
   width : 90vw;
+}
+
+.section_content_header{
+  font-size: large;
+  font-weight: 600;
+}
+
+.content-title{
+  font-weight: 500;
 }
 
 .section_content_header{

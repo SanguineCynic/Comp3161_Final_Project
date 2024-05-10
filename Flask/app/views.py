@@ -909,6 +909,100 @@ def courses_with_50_or_more_students():
     return jsonify(courses_data)
 
 
+# @login_required
+# @app.route('/course/<course_code>')
+# def view_selected_course(course_code):
+#     if 'account_type' not in session:
+#         return redirect(url_for('login'))
+    
+#     sections = []
+#     content_dict = {}
+
+#     try:
+#         query = "SELECT * FROM section WHERE course_code = %s" 
+#         cursor = connection.cursor()
+#         cursor.execute( query, (course_code,))
+#         result = cursor.fetchall()
+#         cursor.close()
+#         for section in result:
+#             sections.append({'section_id':section[0], 'course_code':section[1], 'title':section[2], 'description':section[3]})
+#     except:
+#         pass
+
+#     try:
+#         for section in result:
+#             content = []
+#             query = "SELECT * FROM content WHERE section_id = %s" 
+#             cursor = connection.cursor()
+#             cursor.execute( query, (section[0],))
+#             result2 = cursor.fetchall()
+#             cursor.close()
+#             for cont in result2:
+#                 content.append({'content_id':cont[0], 'section_id':cont[1], 'title':section[2], 'files_names':cont[3], 'material': cont[4]})
+#             content_dict[section[0]] = content
+#     except:
+#         pass
+#     if session['account_type'] == UserType.STUDENT.value:
+#         return render_template('viewCourseStudent.html', sections=sections, content_dict=content_dict, courseCode=course_code)
+#     else:
+#         return render_template('viewCourse.html', sections=sections, content_dict=content_dict, courseCode=course_code)
+    
+
+# @login_required
+# @app.route('/course/add_section/<course_code>', methods=['POST', 'GET'])
+# def add_course_section(course_code):
+#     if request.method == 'GET':
+#         if session.get('account_type') == UserType.STUDENT.value:
+#             return render_template('viewCourseStudent.html', courseCode=course_code)
+#         else:
+#             return render_template('addSection.html', courseCode=course_code) 
+#     elif request.method == 'POST':
+#         # Extract data from the request
+#         data = request.get_json()
+        
+#         # Validate the data (add your validation logic here)
+#         # For simplicity, this example assumes all fields are required and valid
+#         name = data.get('name')
+#         description = data.get('description')
+#         course_code = data.get('course_code')
+
+#         cursor.execute("SELECT course_code from course")
+#         courses = cursor.fetchall()
+#         #Refine fetchall into simple list
+#         courses = [course[0] for course in courses]
+
+#         if not name or not description or not course_code:
+#             return jsonify({"error": "Name, description and course code are required"}), 400
+        
+#         if course_code.upper() in courses:
+#             #calculate forumID
+#             cursor.execute("SELECT MAX(forum_id) from DiscussionForum")
+#             currentForum = cursor.fetchone()[0]
+#             if not currentForum:
+#                 forum_id = 1
+#             else:
+#                 forum_id = currentForum+1
+#             print(currentForum)
+
+#             cursor.execute("INSERT INTO DiscussionForum (forum_id, course_id, title, description) VALUES (%s,%s,%s,%s)",(forum_id,course_code.upper(),name,description))
+#             connection.commit()
+#             # Return the newly created forum
+#             cursor.execute("SELECT * FROM DiscussionForum WHERE title = %s", (name,))
+#             new_forum = cursor.fetchone()
+#             # return jsonify(new_forum), 201
+#             return jsonify({"message":"Forum created successfully!"}), 200
+#         else:
+#             return jsonify({"error":"Course code not found"}), 404
+
+
+
+        
+#         # Insert the new forum into the database
+#         cursor = connection.cursor()
+#         cursor.execute("INSERT INTO DiscussionForum (name, description) VALUES (%s, %s)", (name, description))
+#         connection.commit()
+        
+
 @login_required
 @app.route('/course/<course_code>')
 def view_selected_course(course_code):
@@ -1088,7 +1182,6 @@ def add_course_section_content(course_code, section_id):
         """
 
 
-
 @app.route('/report/', methods=['GET'])
 def generate_report():
     cursor = connection.cursor()
@@ -1167,41 +1260,241 @@ LIMIT 10;
 
 
 
-###############################################################
- # Discussion Forum Functions
-
- # discussionforum(forum_id	course_id	title	description)
-###############################################################
-
-@login_required
-@app.route('/webforums/<course_code>', methods=['GET', 'POST'])
-def discussion_forums(course_code):
-    discussion = {
-        'course_code': course_code,
-        'title': 'Discussion Forum',
-        'content': 'Welcome to the discussion forum!'
-    }
-
-    replies = [
-        {'user': session['user_firstname'],
-        'content': 'Hello, how are you?'
-        },
-        {'user': 'Sarah',
-        'content': 'It been a while?'
-        },
-        {'user': 'Jon',
-        'content': 'Mmhh, I am good. How about you?'
-        }
-    ]
-    return render_template('discussionForum.html', course_code=course_code, discussion=discussion, replies=replies)
 
 
+########################################################## DISCUSSION FORUMS ##################################################
+###############################################################################################################################
+@app.route('/forums', methods=['GET', 'POST'])
+def manage_discussion_forums():
+    cursor = connection.cursor()
+    # if request.method == 'GET':
+    if request.method == 'GET':
+        
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM discussionforum")
+        results = cursor.fetchall()
+        
+        data = [ {'forum_id': result[0], 'title': result[1], 'description': result[2]} for result in results ]
+        cursor.close()
+        return  data
 
-@app.route('/h/<course_code>', methods=['GET', 'POST'])
-def get_discussion_forums(course_code):
-    pass
+    
+
+# discussionthread (thread_id	forum_id	user_id	title	content)
+# Should be able to retrieve all the discussion threads for a particular forum
+def foo():
+     if request.method == 'POST':
+        # Extract data from the request
+        form = request.get_json()
+        forum_id = form["forum_id"]
+        user_id = form["user_id"]
+        title = form["title"]
+        content = form["content"]
+
+        # Validate the data (add your validation logic here)
+        # check if forum_id is valid
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM discussionforum WHERE forum_id = %s", (forum_id,))
+        result = cursor.fetchone()
+        if not result:
+            return jsonify({"error": "Forum ID not found"}), 404
+        # check if user_id is valid
+        cursor.execute("SELECT * FROM user WHERE user_id = %s", (user_id,))
+        result = cursor.fetchone()
+        if not result:
+            return jsonify({"error": "User ID not found"}), 404
+        cursor.execute("INSERT INTO discussionthread (forum_id, user_id, title, content) VALUES (%s, %s, %s, %s)", (forum_id, user_id, title, content))
+        #insert three for forum_id  = 1
+
+@app.route('/forums/<course_id>', methods=['GET', 'POST'])
+def discussion_thread(course_id):
+    if request.method == 'GET':
+
+        cursor = connection.cursor()
+        try:
+            data = request.get_json()
+            course_id = data.get('course_id').upper()
+        except:
+            course_id = course_id.upper()
+        # check if course_id is valid
+        cursor.execute("SELECT * FROM course WHERE course_code = %s", (course_id,))
+        result = cursor.fetchone()
+        if not result:
+            return jsonify({"error": "Course ID not found"}), 404
+        
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM discussionforum  WHERE course_id = %s", (course_id,))
+        results = cursor.fetchall()
+        
+        data = [ {'forum_id': result[0], 'title': result[1], 'description': result[2]} for result in results ]
+        cursor.close()
+        return  data
+
+    if request.method == 'POST':
+        
+        # Validate the data (add your validation logic here)
+        # For simplicity, this example assumes all fields are required and valid
+        data = request.get_json()
+        
+        course_id = data.get('course_id').upper()
+        title = data.get('title')
+        description = data.get('description')
+        
+        
+        # check if course_id is valid
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM course WHERE course_code = %s", (course_id,))
+          
+        result = cursor.fetchone()
+        
+        if not result:
+            return jsonify({"error": "Course ID not found"}), 404
+        
+        
+        # insert into discussionforum
+        cursor.execute("INSERT INTO discussionforum (course_id, title, description) VALUES (%s, %s, %s)", (course_id, title, description))
+        connection.commit()
+        cursor.close()
+
+        # return the newly created discussionforum with created message
+        cursor = connection.cursor()
+        cursor.execute("SELECT * FROM discussionforum  WHERE course_id = %s and title = %s and description = %s", (course_id, title, description))
+        result = cursor.fetchone()
+        cursor.close()
+        if not result:
+            return jsonify({"error": "Failed to create discussion forum"}), 500
+        return jsonify({"message": "Discussion forum created successfully", "discussionforum": {"forum_id": result[0], "title": result[1], "description": result[2]}}), 201
 
 
+# route for discussion threads
+@app.route('/forums/<forum_id>/threads', methods=['GET', 'POST'])  
+def discussion_threads(forum_id):
+    if request.method == 'POST':
+        data = request.get_json()
+        if 'forum_id' in data and 'user_id' in data and 'title' in data and 'content' in data:
+            try:
+                forum_id = data['forum_id']
+            except:
+                forum_id = forum_id
+            
+            user_id = data['user_id']
+            title = data['title']
+            content = data['content']
+            cursor = connection.cursor()
+            # check if user_id is valid
+            cursor.execute("SELECT * FROM user WHERE user_id = %s", (user_id,))
+            result = cursor.fetchone()
+            if not result:
+                return jsonify({"error": "User ID not found"}), 404
+            
+            # insert into discussionthread
+            cursor.execute("INSERT INTO discussionthread (forum_id, user_id, title, content) VALUES (%s, %s, %s, %s)", (forum_id, user_id, title, content))
+            connection.commit()
+            cursor.close()
+
+
+            # return the newly created discussionthread with created message
+            cursor = connection.cursor()
+            cursor.execute("SELECT * FROM discussionthread  WHERE forum_id = %s and user_id = %s and title = %s and content = %s", (forum_id, user_id, title, content))
+            result = cursor.fetchone()
+            cursor.close()
+            if not result:
+                return jsonify({"error": "Failed to create discussion thread"}), 500
+            
+            return jsonify({"message": "Thread created successfully", "thread": {"thread_id": result[0], "forum_id": result[1], "user_id": result[2], "title": result[3], "content": result[4]}}), 201
+        else:
+            return jsonify({"error": "Missing required fields"}), 400
+        
+    if request.method == 'GET':
+        # check if course_id is valid
+        cursor = connection.cursor()
+        try:
+            data = request.get_json()
+            forum_id = data.get('forum_id')
+        except:
+            forum_id = forum_id
+        cursor.execute("SELECT * FROM discussionthread WHERE forum_id = %s", (forum_id,))
+        results = cursor.fetchall()
+        if not results:
+            return jsonify({"error": "Forum ID not found"}), 404
+        
+        data = [ {'thread_id': result[0], 'forum_id': result[1], 'user_id': result[2], 'title': result[3], 'content': result[4]} for result in results ]
+        cursor.close()
+        return  data
+    
+    #simulare a reply
+
+
+# route for discussion threads replies
+# reply (	reply_id	thread_id	user_id	parent_reply_id	message)
+@app.route('/threads/<thread_id>/replies', methods=['GET', 'POST'])
+def replies(thread_id):
+    if request.method == 'POST':
+        data = request.get_json()
+        # case where the reply is not a child reply
+        if 'thread_id' in data and 'user_id' in data and 'message' in data and 'parent_reply_id' not in data:
+            try:
+                thread_id = data['thread_id']
+            except:
+                thread_id = thread_id
+            # check that the thread_id exists
+            cursor = connection.cursor()
+            cursor.execute("SELECT * FROM discussionthread WHERE thread_id = %s", (thread_id,))
+            result = cursor.fetchone()
+            if not result:
+                return jsonify({"error": "Thread ID not found"}), 404
+            
+            parent_reply_id = thread_id
+            user_id = data['user_id']
+            message = data['message']
+
+            # check if user_id is valid
+            cursor = connection.cursor()
+            cursor.execute("SELECT * FROM user WHERE user_id = %s", (user_id,))
+            result = cursor.fetchone()
+            if not result:
+                return jsonify({"error": "User ID not found"}), 404
+            
+            cursor = connection.cursor()
+            cursor.execute("INSERT INTO reply (thread_id,  user_id, message, parent_reply_id) VALUES (%s, %s, %s, %s)", (thread_id, user_id, message, parent_reply_id))
+            connection.commit()
+
+            
+            cursor.close()
+            return jsonify({"message": "Reply created successfully"}), 201
+        
+        # case where the reply is a child reply
+        if 'thread_id' in data and 'user_id' in data and 'message' in data and 'parent_reply_id' in data:
+            try:
+                thread_id = data['thread_id']
+            except:
+                thread_id = thread_id
+            
+            # check that the thread_id exists for the parent_reply_id
+            cursor = connection.cursor()
+            cursor.execute("SELECT thread_id FROM reply WHERE reply_id = %s", (data['parent_reply_id'],))
+            result = cursor.fetchone()
+            if not result:
+                return jsonify({"error": "Parent thread ID not found"}), 404
+
+            user_id = data['user_id']
+            message = data['message']
+            parent_reply_id = data['parent_reply_id']
+
+            # check if user_id is valid
+            cursor = connection.cursor()
+            cursor.execute("SELECT * FROM user WHERE user_id = %s", (user_id,))
+            result = cursor.fetchone()
+            if not result:
+                return jsonify({"error": "User ID not found"}), 404
+            cursor = connection.cursor()
+            cursor.execute("INSERT INTO reply (thread_id, user_id, message, parent_reply_id) VALUES (%s, %s, %s, %s)", (thread_id, user_id, message, parent_reply_id))
+            connection.commit()
+            cursor.close()
+            return jsonify({"message": "Reply created successfully"}), 201 
+        
+        else:
+            return jsonify({"error": "Missing required fields"}), 400
 
 ##########################################################
 # Functions for general functionality (helper functions) #
