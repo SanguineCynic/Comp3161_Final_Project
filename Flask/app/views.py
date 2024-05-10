@@ -960,39 +960,39 @@ def manage_discussion_forums():
 @login_required
 @app.route('/course/<course_code>')
 def view_selected_course(course_code):
-    if session['account_type'] == UserType.STUDENT.value:
-        return render_template('viewCourseStudent.html', courseCode=course_code)
-    else:
-        if 'account_type' not in session:
-            return redirect(url_for('login'))
-        
-        sections = []
-        content_dict = {}
+    if 'account_type' not in session:
+        return redirect(url_for('login'))
+    
+    sections = []
+    content_dict = {}
 
-        try:
-            query = "SELECT * FROM section WHERE course_code = %s" 
+    try:
+        query = "SELECT * FROM section WHERE course_code = %s" 
+        cursor = connection.cursor()
+        cursor.execute( query, (course_code,))
+        result = cursor.fetchall()
+        cursor.close()
+        for section in result:
+            sections.append({'section_id':section[0], 'course_code':section[1], 'title':section[2], 'description':section[3]})
+    except:
+        pass
+
+    try:
+        for section in result:
+            content = []
+            query = "SELECT * FROM content WHERE section_id = %s" 
             cursor = connection.cursor()
-            cursor.execute( query, (course_code,))
-            result = cursor.fetchall()
+            cursor.execute( query, (section[0],))
+            result2 = cursor.fetchall()
             cursor.close()
-            for section in result:
-                sections.append({'section_id':section[0], 'course_code':section[1], 'title':section[2], 'description':section[3]})
-        except:
-            pass
-
-        try:
-            for section in result:
-                content = []
-                query = "SELECT * FROM content WHERE section_id = %s" 
-                cursor = connection.cursor()
-                cursor.execute( query, (section[0],))
-                result2 = cursor.fetchall()
-                cursor.close()
-                for cont in result2:
-                    content.append({'content_id':cont[0], 'section_id':cont[1], 'title':section[2], 'files_names':cont[3], 'material': cont[4]})
-                content_dict[section[0]] = content
-        except:
-            pass
+            for cont in result2:
+                content.append({'content_id':cont[0], 'section_id':cont[1], 'title':section[2], 'files_names':cont[3], 'material': cont[4]})
+            content_dict[section[0]] = content
+    except:
+        pass
+    if session['account_type'] == UserType.STUDENT.value:
+        return render_template('viewCourseStudent.html', sections=sections, content_dict=content_dict, courseCode=course_code)
+    else:
         return render_template('viewCourse.html', sections=sections, content_dict=content_dict, courseCode=course_code)
     
 
