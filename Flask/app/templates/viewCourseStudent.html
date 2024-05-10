@@ -1,7 +1,17 @@
 {% extends "base.html" %}
 
 {% block header %}
-  {% include session['account_type'] ~ 'Header.html' %}
+  {% if session['account_type'] == 'admin' %}
+    {% include 'adminHeader.html' %}
+  {% endif %}
+
+  {% if session['account_type'] == 'lecturer' %}
+    {% include 'lecturerHeader.html' %}
+  {% endif %}
+
+  {% if session['account_type'] == 'student' %}
+    {% include 'studentHeader.html' %}
+  {% endif %}
 {% endblock %}
 
 {% block main %}
@@ -10,26 +20,38 @@
       <div class="col-md-8">
         <div class="card">
           <div class="card-body">
-            <h2 class="card-title">{{ course_title }}</h2>
-            <h5 class="card-subtitle mb-2 text-muted">Course Code: {{ course_code }}</h5>
-            <p class="card-text">{{ course_description }}</p>
+            <div class="courseHeader flex">
+              <h2 class="card-title">{{ courseCode }}</h2>
+            </div>
+            <!-- <h5 class="card-subtitle mb-2 text-muted">Course Code:</h5> -->
+            <!-- <p class="card-text">This course introduces students to the fundamentals of computer science.</p> -->
 
             <h3>Sections</h3>
             <div class="accordion" id="sectionsAccordion">
-              {% for section in sections %}
               <div class="accordion-item">
-                <h2 class="accordion-header" id="section{{ loop.index }}Heading">
-                  <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#section{{ loop.index }}Collapse" aria-expanded="true" aria-controls="section{{ loop.index }}Collapse">
-                    Section {{ loop.index }}: {{ section.title }}
+                <h2 class="accordion-header" id="section1Heading">
+                  <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#section1Collapse" aria-expanded="true" aria-controls="section1Collapse">
+                    Section 1: Introduction
                   </button>
                 </h2>
-                <div id="section{{ loop.index }}Collapse" class="accordion-collapse collapse show" aria-labelledby="section{{ loop.index }}Heading" data-bs-parent="#sectionsAccordion">
+                <div id="section1Collapse" class="accordion-collapse collapse show" aria-labelledby="section1Heading" data-bs-parent="#sectionsAccordion">
                   <div class="accordion-body">
-                    {{ section.description }}
+                    This section covers basic concepts such as programming languages and algorithms.
                   </div>
                 </div>
               </div>
-              {% endfor %}
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="section2Heading">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#section2Collapse" aria-expanded="false" aria-controls="section2Collapse">
+                    Section 2: Data Structures
+                  </button>
+                </h2>
+                <div id="section2Collapse" class="accordion-collapse collapse" aria-labelledby="section2Heading" data-bs-parent="#sectionsAccordion">
+                  <div class="accordion-body">
+                    This section explores various data structures like arrays, linked lists, and trees.
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -68,12 +90,4 @@
       }
     });
   </script>
-{% endblock %}
-
-{% block css %}
-<style>
-.container {
-  width : 90vw;
-}
-</style>
 {% endblock %}
