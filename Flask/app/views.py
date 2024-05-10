@@ -325,7 +325,15 @@ def my_login_manager(username,password):
     user_data = cursor.fetchone()
     if user_data:
         user_id, fname, lname, account_type, hashed_password = user_data
-        if username == str(user_id) and bcrypt.check_password_hash(hashed_password, password):
+        try:
+            password_check = bcrypt.check_password_hash(hashed_password, password)
+        except:
+            if hashed_password == password:
+                password_check = True
+            else:
+                password_check = False
+
+        if username == str(user_id) and password_check: ##j jj
             user = load_user(user_id)
             login_user(user)
             session['user_id'] = user_id
@@ -901,99 +909,42 @@ def courses_with_50_or_more_students():
     return jsonify(courses_data)
 
 
-# DISCUSSION FORUMS
-@app.route('/forums', methods=['GET', 'POST'])
-def manage_discussion_forums():
-    cursor = connection.cursor()
-    if request.method == 'GET':
-        # Retrieve all forums
-        cursor.execute("SELECT * FROM DiscussionForum")
-        forums = cursor.fetchall()
-        return jsonify(forums)
-    elif request.method == 'POST':
-        # Extract data from the request
-        data = request.get_json()
-        
-        # Validate the data (add your validation logic here)
-        # For simplicity, this example assumes all fields are required and valid
-        name = data.get('name')
-        description = data.get('description')
-        course_code = data.get('course_code')
-
-        cursor.execute("SELECT course_code from course")
-        courses = cursor.fetchall()
-        #Refine fetchall into simple list
-        courses = [course[0] for course in courses]
-
-        if not name or not description or not course_code:
-            return jsonify({"error": "Name, description and course code are required"}), 400
-        
-        if course_code.upper() in courses:
-            #calculate forumID
-            cursor.execute("SELECT MAX(forum_id) from DiscussionForum")
-            currentForum = cursor.fetchone()[0]
-            if not currentForum:
-                forum_id = 1
-            else:
-                forum_id = currentForum+1
-            print(currentForum)
-
-            cursor.execute("INSERT INTO DiscussionForum (forum_id, course_id, title, description) VALUES (%s,%s,%s,%s)",(forum_id,course_code.upper(),name,description))
-            connection.commit()
-            # Return the newly created forum
-            cursor.execute("SELECT * FROM DiscussionForum WHERE title = %s", (name,))
-            new_forum = cursor.fetchone()
-            # return jsonify(new_forum), 201
-            return jsonify({"message":"Forum created successfully!"}), 200
-        else:
-            return jsonify({"error":"Course code not found"}), 404
-
-
-
-        
-        # Insert the new forum into the database
-        cursor = connection.cursor()
-        cursor.execute("INSERT INTO DiscussionForum (name, description) VALUES (%s, %s)", (name, description))
-        connection.commit()
-        
-
 @login_required
 @app.route('/course/<course_code>')
 def view_selected_course(course_code):
-    if session['account_type'] == UserType.STUDENT.value:
-        return render_template('viewCourseStudent.html', courseCode=course_code)
-    else:
-        if 'account_type' not in session:
-            return redirect(url_for('login'))
-        
-        sections = []
-        content_dict = {}
-        content = []
+    if 'account_type' not in session:
+        return redirect(url_for('login'))
+    
+    sections = []
+    content_dict = {}
 
-        try:
-            query = "SELECT * FROM section WHERE course_code = %s" 
+    try:
+        query = "SELECT * FROM section WHERE course_code = %s" 
+        cursor = connection.cursor()
+        cursor.execute( query, (course_code,))
+        result = cursor.fetchall()
+        cursor.close()
+        for section in result:
+            sections.append({'section_id':section[0], 'course_code':section[1], 'title':section[2], 'description':section[3]})
+    except:
+        pass
+
+    try:
+        for section in result:
+            content = []
+            query = "SELECT * FROM content WHERE section_id = %s" 
             cursor = connection.cursor()
-            cursor.execute( query, (course_code,))
-            result = cursor.fetchall()
+            cursor.execute( query, (section[0],))
+            result2 = cursor.fetchall()
             cursor.close()
-            for section in result:
-                sections.append({'section_id':section[0], 'course_code':section[1], 'title':section[2], 'description':section[3]})
-        except:
-            pass
-
-        try:
-            for section in result:
-                query = "SELECT * FROM content WHERE section_id = %s" 
-                cursor = connection.cursor()
-                cursor.execute( query, (section[0],))
-                result2 = cursor.fetchall()
-                cursor.close()
-                for cont in result2:
-                    content.append({'content_id':cont[0], 'section_id':cont[1], 'title':section[2], 'files_names':cont[3], 'material': cont[4]})
-                content_dict[section[0]] = content
-                print(content_dict)
-        except:
-            pass
+            for cont in result2:
+                content.append({'content_id':cont[0], 'section_id':cont[1], 'title':section[2], 'files_names':cont[3], 'material': cont[4]})
+            content_dict[section[0]] = content
+    except:
+        pass
+    if session['account_type'] == UserType.STUDENT.value:
+        return render_template('viewCourseStudent.html', sections=sections, content_dict=content_dict, courseCode=course_code)
+    else:
         return render_template('viewCourse.html', sections=sections, content_dict=content_dict, courseCode=course_code)
     
 
@@ -1027,6 +978,115 @@ def add_course_section(course_code):
             return render_template('viewCourse.html', courseCode=course_code), 500
     flash("Invalid request method", 'danger')
     return render_template('viewCourse.html', courseCode=course_code), 400
+
+
+
+@login_required
+@app.route('/course/add_content/<course_code>/<int:section_id>', methods=['POST', 'GET'])
+def add_course_section_content(course_code, section_id):
+    if request.method == 'GET':
+        if session.get('account_type') == UserType.STUDENT.value:
+            return render_template('viewCourseStudent.html', courseCode=course_code)
+        else:
+            cursor = connection.cursor()
+            cursor.execute("SELECT title FROM section WHERE section_id = %s", (section_id,))
+            result = cursor.fetchone()
+            cursor.close()
+            return render_template('addContent.html', courseCode=course_code, sectionId=section_id, section_title=result[0]) 
+    elif request.method == 'POST':
+        try:
+            if request.is_json:
+                form = request.get_json()
+            else:
+                form = request.form.to_dict()
+                
+            if 'title' in form:
+                title = form['title']
+                file_name = form['fileName']
+                material = form['material']
+                cursor = connection.cursor()
+                cursor.execute("SELECT title FROM section WHERE section_id = %s", (section_id,))
+                result = cursor.fetchone()
+                if len(file_name) > 0 and not file_name.endswith('.pdf') and not file_name.endswith('.ppt'):
+                    flash("File Name must either be .pdf or .ppt", 'danger')
+                    return render_template('addContent.html', courseCode=course_code, sectionId=section_id, section_title=result[0])
+                if len(file_name) > 0 and len(material) > 0:
+                    fileName = json.dumps({'text': file_name})
+                    cursor.execute("INSERT INTO content (section_id, title, files_names, material) VALUES (%s,%s, %s, %s)", (section_id, title, fileName, material))
+                elif len(file_name) == 0 and len(material) == 0:
+                    flash("User must enter either a file name or course material", 'danger')
+                    return render_template('addContent.html', courseCode=course_code, sectionId=section_id, section_title=result[0])
+                elif len(file_name) > 0 and len(material) == 0:
+                    fileName = json.dumps({'text': file_name})
+                    cursor.execute("INSERT INTO content (section_id, title, files_names) VALUES (%s, %s, %s)", (section_id, title, fileName))
+                elif len(file_name) == 0 and len(material) > 0:
+                    fileName = json.dumps({'text': file_name})
+                    cursor.execute("INSERT INTO content (section_id, title, material) VALUES (%s, %s, %s)", (section_id, title, material))
+                connection.commit()
+                cursor.close()
+                flash("Content Added Successfully: " + title, 'success')
+                return render_template('addContent.html', courseCode=course_code, sectionId=section_id, section_title=result[0])
+        except Exception as e:
+            print(e)
+            cursor = connection.cursor()
+            cursor.execute("SELECT title FROM section WHERE section_id = %s", (section_id,))
+            result = cursor.fetchone()
+            cursor.close()
+            flash("An error occurred while adding the content", 'danger')
+            return render_template('addContent.html', courseCode=course_code, sectionId=section_id, section_title=result[0]), 500
+    cursor = connection.cursor()
+    cursor.execute("SELECT title FROM section WHERE section_id = %s", (section_id,))
+    result = cursor.fetchone()
+    cursor.close()
+    flash("Invalid request method", 'danger')
+    return render_template('addContent.html', courseCode=course_code, sectionId=section_id, section_title=result[0]), 400
+
+
+
+    
+    """
+    try:
+        form = request.get_json()
+        if 'username' in form and 'password' in form:
+            username = form['username']
+            password = form['password']
+            logged_in = my_login_manager(username, password)
+            if logged_in:
+                return logged_in, 200
+            else:
+                return jsonify({"message": "Invalid username or password"}), 400
+        
+        return jsonify({"message": "Missing username or password"}), 400
+    
+    #this section is for web
+    except:
+        form= LoginForm()
+        # redirect to home page if already logged in
+        try:
+            if session['account_type']:
+                return redirect(url_for('home'))
+        except:
+            pass
+        
+        if request.method == 'POST' and form.validate_on_submit:
+            username = request.form['username']
+            password = request.form['password']
+            logged_in = my_login_manager(username, password)
+            if logged_in:
+                user_id = logged_in['user']['user_id']
+                user = load_user(user_id)
+                login_user(user)
+                session['user_firstname'] = logged_in['user']['fname']
+                session['account_type'] = logged_in['user']['account_type']
+                session['user_id'] = logged_in['user']['user_id']
+
+                flash('You are now logged in', 'success')
+                return redirect(url_for("home"))
+            else:
+                flash('Invalid username or password', 'danger')
+        return render_template("login.html", form=form)
+        """
+
 
 
 @app.route('/report/', methods=['GET'])
@@ -1105,192 +1165,41 @@ LIMIT 10;
     # For use when front-end is designed
     return render_template('report.html', topstudents=Top10Students, lecturers=Teaching3OrMore, topenrollment=Top10Courses, studentsover5=StudentsOver5, coursesover50=CoursesOver50)
 
+
+
+###############################################################
+ # Discussion Forum Functions
+
+ # discussionforum(forum_id	course_id	title	description)
+###############################################################
+
 @login_required
-@app.route('/course/add_content/<course_code>/<int:section_id>', methods=['POST', 'GET'])
-def add_course_section_content(course_code, section_id):
-    if request.method == 'GET':
-        if session.get('account_type') == UserType.STUDENT.value:
-            return render_template('viewCourseStudent.html', courseCode=course_code)
-        else:
-            cursor = connection.cursor()
-            cursor.execute("SELECT title FROM section WHERE section_id = %s", (section_id,))
-            result = cursor.fetchone()
-            cursor.close()
-            return render_template('addContent.html', courseCode=course_code, sectionId=section_id, section_title=result[0]) 
-    elif request.method == 'POST':
-        try:
-            if request.is_json:
-                form = request.get_json()
-            else:
-                form = request.form.to_dict()
-                
-            if 'title' in form:
-                title = form['title']
-                file_name = form['fileName']
-                print(file_name.endswith('.pdf'))
-                print(file_name.endswith('.ppt'))
-                print(len(file_name))
-                material = form['material']
-                cursor = connection.cursor()
-                cursor.execute("SELECT title FROM section WHERE section_id = %s", (section_id,))
-                result = cursor.fetchone()
-                if not file_name.endswith('.pdf') and not file_name.endswith('.ppt'):
-                    flash("File Name must either be .pdf or .ppt", 'danger')
-                    return render_template('addContent.html', courseCode=course_code, sectionId=section_id, section_title=result[0])
-                if len(file_name) > 0 and len(material) > 0:
-                    fileName = json.dumps({'text': file_name})
-                    cursor.execute("INSERT INTO content (section_id, title, files_names, material) VALUES (%s, %s, %s)", (section_id, title, fileName, material))
-                elif len(file_name) == 0 and len(material) == 0:
-                    flash("User must enter either a file name or course material", 'danger')
-                    return render_template('addContent.html', courseCode=course_code, sectionId=section_id, section_title=result[0])
-                elif len(file_name) > 0 and len(material) == 0:
-                    fileName = json.dumps({'text': file_name})
-                    cursor.execute("INSERT INTO content (section_id, title, files_names) VALUES (%s, %s, %s)", (section_id, title, fileName))
-                elif len(file_name) == 0 and len(material) > 0:
-                    fileName = json.dumps({'text': file_name})
-                    cursor.execute("INSERT INTO content (section_id, title, material) VALUES (%s, %s, %s)", (section_id, title, material))
-                connection.commit()
-                cursor.close()
-                flash("Content Added Successfully: " + title, 'success')
-                return render_template('addContent.html', courseCode=course_code, sectionId=section_id, section_title=result[0])
-        except Exception as e:
-            print(e)
-            cursor = connection.cursor()
-            cursor.execute("SELECT title FROM section WHERE section_id = %s", (section_id,))
-            result = cursor.fetchone()
-            cursor.close()
-            flash("An error occurred while adding the content", 'danger')
-            return render_template('addContent.html', courseCode=course_code, sectionId=section_id, section_title=result[0]), 500
-    cursor = connection.cursor()
-    cursor.execute("SELECT title FROM section WHERE section_id = %s", (section_id,))
-    result = cursor.fetchone()
-    cursor.close()
-    flash("Invalid request method", 'danger')
-    return render_template('addContent.html', courseCode=course_code, sectionId=section_id, section_title=result[0]), 400
+@app.route('/webforums/<course_code>', methods=['GET', 'POST'])
+def discussion_forums(course_code):
+    discussion = {
+        'course_code': course_code,
+        'title': 'Discussion Forum',
+        'content': 'Welcome to the discussion forum!'
+    }
+
+    replies = [
+        {'user': session['user_firstname'],
+        'content': 'Hello, how are you?'
+        },
+        {'user': 'Sarah',
+        'content': 'It been a while?'
+        },
+        {'user': 'Jon',
+        'content': 'Mmhh, I am good. How about you?'
+        }
+    ]
+    return render_template('discussionForum.html', course_code=course_code, discussion=discussion, replies=replies)
 
 
 
-    
-    """
-    try:
-        form = request.get_json()
-        if 'username' in form and 'password' in form:
-            username = form['username']
-            password = form['password']
-            logged_in = my_login_manager(username, password)
-            if logged_in:
-                return logged_in, 200
-            else:
-                return jsonify({"message": "Invalid username or password"}), 400
-        
-        return jsonify({"message": "Missing username or password"}), 400
-    
-    #this section is for web
-    except:
-        form= LoginForm()
-        # redirect to home page if already logged in
-        try:
-            if session['account_type']:
-                return redirect(url_for('home'))
-        except:
-            pass
-        
-        if request.method == 'POST' and form.validate_on_submit:
-            username = request.form['username']
-            password = request.form['password']
-            logged_in = my_login_manager(username, password)
-            if logged_in:
-                user_id = logged_in['user']['user_id']
-                user = load_user(user_id)
-                login_user(user)
-                session['user_firstname'] = logged_in['user']['fname']
-                session['account_type'] = logged_in['user']['account_type']
-                session['user_id'] = logged_in['user']['user_id']
-
-                flash('You are now logged in', 'success')
-                return redirect(url_for("home"))
-            else:
-                flash('Invalid username or password', 'danger')
-        return render_template("login.html", form=form)
-        """
-
-
-@app.route('/report/', methods=['GET'])
-def generate_repor2t():
-    cursor = connection.cursor()
-
-    # Create views
-    viewQueries = ["""CREATE VIEW CoursesWith50OrMoreStudents AS
-SELECT course_code, COUNT(user_id) AS student_count
-FROM registration
-GROUP BY course_code
-HAVING COUNT(user_id) >= 50;
-""",
-                   
-                   """CREATE VIEW StudentsDoing5OrMoreCourses AS
-SELECT user_id, COUNT(DISTINCT course_code) AS course_count
-FROM registration
-GROUP BY user_id
-HAVING COUNT(DISTINCT course_code) >= 5;
-""",
-
-                   """CREATE VIEW Top10EnrolledCourses AS
-SELECT course_code, COUNT(*) AS enrollment_count
-FROM registration
-GROUP BY course_code
-ORDER BY enrollment_count DESC
-LIMIT 10;
-""",
-                    """CREATE VIEW LecturersTeachingThreeOrMoreCourses AS
-SELECT t.user_id, COUNT(t.course_code) AS course_count
-FROM teaches t
-GROUP BY t.user_id
-HAVING COUNT(t.course_code) >= 3;
-""",
-
-                    """CREATE VIEW Top10Students AS
-SELECT user_id, AVG(final_average) AS OverallAverage
-FROM registration
-GROUP BY user_id
-ORDER BY OverallAverage DESC
-LIMIT 10;
-"""]
-
-    # Executes correctly if views are not made. Ignores the views if they are created already. Views do not have an IF NOT EXISTS clause like tables do.
-    try:
-        for query in viewQueries:
-            print(query)
-            cursor.execute(query)
-        connection.commit()
-    except:
-        pass
-
-    # View selection
-    cursor.execute("SELECT * FROM CoursesWith50OrMoreStudents;")
-    CoursesOver50 = cursor.fetchall()
-    print(CoursesOver50)
-    print("5 or more courses:")
-    cursor.execute("SELECT * FROM StudentsDoing5OrMoreCourses;")
-    StudentsOver5 = cursor.fetchall()
-    print(StudentsOver5)
-    print("Top 10 courses:")
-    cursor.execute("SELECT * FROM Top10EnrolledCourses;")
-    Top10Courses = cursor.fetchall()
-    print(Top10Courses)
-    print("Teaching 3 or more:")
-    cursor.execute("SELECT * FROM LecturersTeachingThreeOrMoreCourses;")
-    Teaching3OrMore = cursor.fetchall()
-    print(Teaching3OrMore)
-    print("Top 10 students: ")
-    cursor.execute("SELECT * FROM Top10Students;")
-    Top10Students = cursor.fetchall()
-    print(Top10Students)
-    connection.commit()
-
-    # return jsonify({"message" : "Reports generated successfully"})
-    # For use when front-end is designed
-    return render_template('report.html', topstudents=Top10Students, lecturers=Teaching3OrMore, topenrollment=Top10Courses, studentsover5=StudentsOver5, coursesover50=CoursesOver50)
-
+@app.route('/h/<course_code>', methods=['GET', 'POST'])
+def get_discussion_forums(course_code):
+    pass
 
 
 

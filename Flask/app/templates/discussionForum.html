@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block main %}
+  <div class="container mt-4">
+    <div class="row">
+      <div class="col-md-8">
+        <div class="card">
+          <div class="card-body">
+            <h2>{{ discussion.title }}</h2>
+            <p>{{ discussion.content }}</p>
+          </div>
+        </div>
+
+        <div class="card mt-4">
+          <div class="card-body">
+            <h3>Replies</h3>
+            <div class="list-group">
+              {% for reply in replies %}
+                <div class="list-group-item">
+                  <strong>{{ reply.user }}</strong>
+                  <p>{{ reply.content }}</p>
+                  
+                  <!-- Form for replying to this specific reply -->
+                  <form action="#" method="post">
+                    <input type="text" name="replyContent" placeholder="Reply ..." class="form-control">
+                  </form>
+
+                  <div class="list-group">
+                      <div class="list-group-item">
+                        <strong>{{ reply.user }}</strong>
+                        <p>{{ reply.content }}</p>
+                        
+                        <!-- Form for replying to this specific nested reply -->
+                        <form action="#" method="post">
+                          <input type="text" name="replyContent" placeholder="Reply ..." class="form-control">
+                        </form>
+
+                        <div class="list-group">
+                            <div class="list-group-item">
+                              <strong>{{ reply.user }}</strong>
+                              <p>{{ reply.content }}</p>
+                              
+                              <!-- Form for replying to this specific nested reply -->
+                              <form action="#" method="post">
+                                <input type="text" name="replyContent" placeholder="Reply ..." class="form-control">
+                              </form>
+                            </div>
+                        </div>
+                        
+                      </div>
+                  </div>
+                  
+                  <!-- Nested replies to this reply -->
+                  {% if reply.replies %}
+                    <div class="list-group">
+                      {% for nested_reply in reply.replies %}
+                        <div class="list-group-item">
+                          <strong>{{ nested_reply.user }}</strong>
+                          <p>{{ nested_reply.content }}</p>
+                          
+                          <!-- Form for replying to this specific nested reply -->
+                          <form action="#" method="post">
+                            <input type="text" name="replyContent" placeholder="Reply ..." class="form-control">
+                          </form>
+                        </div>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+{% endblock %}
