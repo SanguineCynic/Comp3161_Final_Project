@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block header %}
+  {% if session['account_type'] == 'admin' %}
+    {% include 'adminHeader.html' %}
+  {% endif %}
+
+  {% if session['account_type'] == 'lecturer' %}
+    {% include 'lecturerHeader.html' %}
+  {% endif %}
+
+  {% if session['account_type'] == 'student' %}
+    {% include 'studentHeader.html' %}
+  {% endif %}
+{% endblock %}
+
+{% block main %}
+  <div class="container mt-5">
+    <div class="row">
+      <div class="col-md-8">
+        <div class="card">
+          <div class="card-body">
+            <div class="courseHeader flex">
+              <h2 class="card-title">{{ courseCode }}</h2>
+            </div>
+            <!-- <h5 class="card-subtitle mb-2 text-muted">Course Code:</h5> -->
+            <!-- <p class="card-text">This course introduces students to the fundamentals of computer science.</p> -->
+
+            <h3>Sections</h3>
+            <div class="accordion" id="sectionsAccordion">
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="section1Heading">
+                  <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#section1Collapse" aria-expanded="true" aria-controls="section1Collapse">
+                    Section 1: Introduction
+                  </button>
+                </h2>
+                <div id="section1Collapse" class="accordion-collapse collapse show" aria-labelledby="section1Heading" data-bs-parent="#sectionsAccordion">
+                  <div class="accordion-body">
+                    This section covers basic concepts such as programming languages and algorithms.
+                  </div>
+                </div>
+              </div>
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="section2Heading">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#section2Collapse" aria-expanded="false" aria-controls="section2Collapse">
+                    Section 2: Data Structures
+                  </button>
+                </h2>
+                <div id="section2Collapse" class="accordion-collapse collapse" aria-labelledby="section2Heading" data-bs-parent="#sectionsAccordion">
+                  <div class="accordion-body">
+                    This section explores various data structures like arrays, linked lists, and trees.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-body">
+            <h3>Calendar Events</h3>
+            <button class="btn btn-primary" id="toggleEvents">Toggle Events</button>
+            <div id="calendarEvents" style="display: none;">
+              <ul class="list-group">
+                <li class="list-group-item">
+                  <h5 class="card-title">Event 1: Lecture 1</h5>
+                  <p class="card-text">This event is the first lecture of the course.</p>
+                </li>
+                <li class="list-group-item">
+                  <h5 class="card-title">Event 2: Midterm Exam</h5>
+                  <p class="card-text">This event is the midterm exam scheduled for next month.</p>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('toggleEvents').addEventListener('click', function() {
+      var eventsDiv = document.getElementById('calendarEvents');
+      if (eventsDiv.style.display === 'none') {
+        eventsDiv.style.display = 'block';
+      } else {
+        eventsDiv.style.display = 'none';
+      }
+    });
+  </script>
+{% endblock %}

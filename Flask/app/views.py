@@ -2,6 +2,7 @@
 import os, json, string, jwt
 from datetime import datetime, timedelta
 from enum import Enum
+import time
 
 #Flask imports
 from app import app, login_manager
@@ -955,12 +956,188 @@ def manage_discussion_forums():
         cursor.execute("INSERT INTO DiscussionForum (name, description) VALUES (%s, %s)", (name, description))
         connection.commit()
         
-# this has not been tested
+
 @login_required
 @app.route('/course/<course_code>')
 def view_selected_course(course_code):
+    if session['account_type'] == UserType.STUDENT.value:
+        return render_template('viewCourseStudent.html', courseCode=course_code)
+    else:
+        if 'account_type' not in session:
+            return redirect(url_for('login'))
+        
+        sections = []
+        content_dict = {}
+        content = []
 
-    return render_template('viewCourse.html')
+        try:
+            query = "SELECT * FROM section WHERE course_code = %s" 
+            cursor = connection.cursor()
+            cursor.execute( query, (course_code,))
+            result = cursor.fetchall()
+            cursor.close()
+            for section in result:
+                sections.append({'section_id':section[0], 'course_code':section[1], 'title':section[2], 'description':section[3]})
+        except:
+            pass
+
+        try:
+            for section in result:
+                query = "SELECT * FROM content WHERE section_id = %s" 
+                cursor = connection.cursor()
+                cursor.execute( query, (section[0],))
+                result2 = cursor.fetchall()
+                cursor.close()
+                for cont in result2:
+                    content.append({'content_id':cont[0], 'section_id':cont[1], 'title':section[2], 'files_names':cont[3], 'material': cont[4]})
+                content_dict[section[0]] = content
+                print(content_dict)
+        except:
+            pass
+        return render_template('viewCourse.html', sections=sections, content_dict=content_dict, courseCode=course_code)
+    
+
+@login_required
+@app.route('/course/add_section/<course_code>', methods=['POST', 'GET'])
+def add_course_section(course_code):
+    if request.method == 'GET':
+        if session.get('account_type') == UserType.STUDENT.value:
+            return render_template('viewCourseStudent.html', courseCode=course_code)
+        else:
+            return render_template('addSection.html', courseCode=course_code) 
+    elif request.method == 'POST':
+        try:
+            if request.is_json:
+                form = request.get_json()
+            else:
+                form = request.form.to_dict()
+                
+            if 'title' in form and 'description' in form:
+                title = form['title']
+                description = form['description']
+                cursor = connection.cursor()
+                cursor.execute("INSERT INTO section (course_code, title, description) VALUES (%s, %s, %s)", (course_code, title, description))
+                connection.commit()
+                cursor.close()
+                flash("Section Added Successfully: " + title, 'success')
+                return render_template('addSection.html', courseCode=course_code)
+        except Exception as e:
+            print(e)
+            flash("An error occurred while adding the section", 'danger')
+            return render_template('viewCourse.html', courseCode=course_code), 500
+    flash("Invalid request method", 'danger')
+    return render_template('viewCourse.html', courseCode=course_code), 400
+
+
+
+@login_required
+@app.route('/course/add_content/<course_code>/<int:section_id>', methods=['POST', 'GET'])
+def add_course_section_content(course_code, section_id):
+    if request.method == 'GET':
+        if session.get('account_type') == UserType.STUDENT.value:
+            return render_template('viewCourseStudent.html', courseCode=course_code)
+        else:
+            cursor = connection.cursor()
+            cursor.execute("SELECT title FROM section WHERE section_id = %s", (section_id,))
+            result = cursor.fetchone()
+            cursor.close()
+            return render_template('addContent.html', courseCode=course_code, sectionId=section_id, section_title=result[0]) 
+    elif request.method == 'POST':
+        try:
+            if request.is_json:
+                form = request.get_json()
+            else:
+                form = request.form.to_dict()
+                
+            if 'title' in form:
+                title = form['title']
+                file_name = form['fileName']
+                print(file_name.endswith('.pdf'))
+                print(file_name.endswith('.ppt'))
+                print(len(file_name))
+                material = form['material']
+                cursor = connection.cursor()
+                cursor.execute("SELECT title FROM section WHERE section_id = %s", (section_id,))
+                result = cursor.fetchone()
+                if not file_name.endswith('.pdf') and not file_name.endswith('.ppt'):
+                    flash("File Name must either be .pdf or .ppt", 'danger')
+                    return render_template('addContent.html', courseCode=course_code, sectionId=section_id, section_title=result[0])
+                if len(file_name) > 0 and len(material) > 0:
+                    fileName = json.dumps({'text': file_name})
+                    cursor.execute("INSERT INTO content (section_id, title, files_names, material) VALUES (%s, %s, %s)", (section_id, title, fileName, material))
+                elif len(file_name) == 0 and len(material) == 0:
+                    flash("User must enter either a file name or course material", 'danger')
+                    return render_template('addContent.html', courseCode=course_code, sectionId=section_id, section_title=result[0])
+                elif len(file_name) > 0 and len(material) == 0:
+                    fileName = json.dumps({'text': file_name})
+                    cursor.execute("INSERT INTO content (section_id, title, files_names) VALUES (%s, %s, %s)", (section_id, title, fileName))
+                elif len(file_name) == 0 and len(material) > 0:
+                    fileName = json.dumps({'text': file_name})
+                    cursor.execute("INSERT INTO content (section_id, title, material) VALUES (%s, %s, %s)", (section_id, title, material))
+                connection.commit()
+                cursor.close()
+                flash("Content Added Successfully: " + title, 'success')
+                return render_template('addContent.html', courseCode=course_code, sectionId=section_id, section_title=result[0])
+        except Exception as e:
+            print(e)
+            cursor = connection.cursor()
+            cursor.execute("SELECT title FROM section WHERE section_id = %s", (section_id,))
+            result = cursor.fetchone()
+            cursor.close()
+            flash("An error occurred while adding the content", 'danger')
+            return render_template('addContent.html', courseCode=course_code, sectionId=section_id, section_title=result[0]), 500
+    cursor = connection.cursor()
+    cursor.execute("SELECT title FROM section WHERE section_id = %s", (section_id,))
+    result = cursor.fetchone()
+    cursor.close()
+    flash("Invalid request method", 'danger')
+    return render_template('addContent.html', courseCode=course_code, sectionId=section_id, section_title=result[0]), 400
+
+
+
+    
+    """
+    try:
+        form = request.get_json()
+        if 'username' in form and 'password' in form:
+            username = form['username']
+            password = form['password']
+            logged_in = my_login_manager(username, password)
+            if logged_in:
+                return logged_in, 200
+            else:
+                return jsonify({"message": "Invalid username or password"}), 400
+        
+        return jsonify({"message": "Missing username or password"}), 400
+    
+    #this section is for web
+    except:
+        form= LoginForm()
+        # redirect to home page if already logged in
+        try:
+            if session['account_type']:
+                return redirect(url_for('home'))
+        except:
+            pass
+        
+        if request.method == 'POST' and form.validate_on_submit:
+            username = request.form['username']
+            password = request.form['password']
+            logged_in = my_login_manager(username, password)
+            if logged_in:
+                user_id = logged_in['user']['user_id']
+                user = load_user(user_id)
+                login_user(user)
+                session['user_firstname'] = logged_in['user']['fname']
+                session['account_type'] = logged_in['user']['account_type']
+                session['user_id'] = logged_in['user']['user_id']
+
+                flash('You are now logged in', 'success')
+                return redirect(url_for("home"))
+            else:
+                flash('Invalid username or password', 'danger')
+        return render_template("login.html", form=form)
+        """
 
 
 @app.route('/report/', methods=['GET'])
