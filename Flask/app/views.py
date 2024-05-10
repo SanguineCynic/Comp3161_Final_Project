@@ -781,49 +781,47 @@ def add_user():
             pass
         return render_template('addUser.html', form=form)
 
-
-# retrieve members of a course
+# Postman api endpoint for choosing your own user_id, password and account_type
 @login_required
-@app.route('/retrieve/members/<course_code>', methods = ['GET', 'POST']) 
-def retrieve_members_by_course(course_code):
-    try:
-   
-        #check if the course exists
-        cursor = connection.cursor()
-        cursor.execute("SELECT * FROM course WHERE course_code = %s", (course_code,))
-        result = cursor.fetchone()
-        if not result:
-            flash('Course does not exist', 'danger')
-            return redirect(url_for('retrieve_members'))
-        
-        
-        cursor = connection.cursor()
-        cursor.execute("SELECT registration.user_id, user.fname, user.lname FROM registration \
-                    JOIN user on registration.user_id  = user.user_id WHERE registration.course_code = %s", (course_code,))
-        students = cursor.fetchall()
+@app.route('/api/add/user', methods=['GET', 'POST'])
+def api_add_user():
+    if request.method == 'POST':
+        try:
+            form = request.get_json()
+            if form:
+                user_id = form['user_id']
+                password = form['password']
+                account_type = form['account_type']
+                fname = form['fname']
+                lname = form['lname']
 
-        cursor.execute("SELECT teaches.user_id, user.fname, user.lname FROM teaches \
-                    JOIN user on teaches.user_id  = user.user_id WHERE teaches.course_code = %s", (course_code,))
-        lecturers = cursor.fetchall()
-        # print(students)
-        
-        if not students:
-            students = []
-        else:
-            students = [dict(zip(['student_id', 'fname', 'lname'], student)) for student in students]
-        if not lecturers:
-            lecturers = []
-        else:
-            lecturers = [dict(zip(['student_id', 'fname', 'lname'], lecturer)) for lecturer in lecturers]
-        
-        cursor.close()
-        form = MembershipForm()
-        flash('Course retrieved successfully', 'success')
-        if not lecturers and not students:
-            flash('there are no members in this course', 'success')
-        return render_template('retrieveMembers.html', students=students, lecturers=lecturers, course_code=course_code, form=form) 
-    except:
-        return render_template('retrieveMembers.html', students=students, lecturers=lecturers, course_code=course_code, form=form) 
+                # Validate account_type
+                valid_account_types = ['student', 'lecturer', 'admin']
+                if account_type.lower() not in valid_account_types:
+                    return jsonify({"message": "Invalid account type"})
+
+                # Generate a random password if not provided
+                if not password:
+                    password = generate_random_password(7)
+
+                # Hash the password
+                hashed_password = bcrypt.generate_password_hash(password)
+
+                # Insert the new user into the database
+                try:
+                    cursor = connection.cursor()
+                    cursor.execute("INSERT INTO user VALUES (%s, %s, %s, %s, %s)", (user_id, fname, lname, account_type, hashed_password))
+                    connection.commit()
+                    cursor.close()
+
+                    return jsonify({"message": "User added successfully", "user_id": user_id, "password": password, "account_type": account_type})
+                except Exception as e:
+                    return jsonify({"message": "User not added", "error": str(e)})
+        except Exception as e:
+            return jsonify({"message": "Error processing request", "error": str(e)})
+
+    # Handle GET request or invalid POST request
+    return jsonify({"message": "Invalid request method or missing parameters"}), 400
 
 
 @login_required
