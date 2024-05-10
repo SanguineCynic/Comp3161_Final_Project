@@ -27,7 +27,6 @@
             {{ message }}
             {{ flash }}
             <h3>Sections</h3>
-            {{ content_dict }}
             {% if not sections %}
               <p>There is no content for this Course</p>
             {% else %}
@@ -41,25 +40,31 @@
                   </h2>
                   {% if loop.index == 1 %}
                     <div id="section{{ loop.index }}Collapse" class="accordion-collapse collapse show" aria-labelledby="section{{ loop.index }}Heading" data-bs-parent="#sectionsAccordion">
+                  {% else %}
+                    <div id="section{{ loop.index }}Collapse" class="accordion-collapse collapse" aria-labelledby="section{{ loop.index }}Heading" data-bs-parent="#sectionsAccordion">
+                  {% endif %}
                       <div class="accordion-body">
                         <p>{{section.description}}</p>
-                        <p class="section_content_header">Section Content</p>
+                        {% if content_dict[section.section_id] %}
+                          <p class="section_content_header ">Section Content</p>
+                        {% else %}
+                          <p class="section_content_header ">There is no content for this section</p>
+                        {% endif %}
                         {% for content in content_dict[section.section_id] %}
-                          <p>{{content.title}}</p>
+                          <hr>
+                          <p class="content-title">{{content.title}}</p>
+                          {% if content.files_names != None %}
+                            {% set file_name = content.files_names | replace('{"text": "', '') | replace('"}', '') %}
+                            <p class="content-file">{{file_name}}</p>
+                          {% endif %}
+                          {% if content.material != None %}
+                            <p class="content-material">{{content.material}}</p>
+                          {% endif %}
+                          
                         {% endfor %}
                         <a href="{{url_for('add_course_section_content', course_code=courseCode, section_id=section.section_id)}}"><button type="button" class="btn btn-primary">Add Content</button></a>
                       </div>
                     </div>
-                  {% else %}
-                    <div id="section{{ loop.index }}Collapse" class="accordion-collapse collapse" aria-labelledby="section{{ loop.index }}Heading" data-bs-parent="#sectionsAccordion">
-                      <div class="accordion-body">
-                        <p>{{section.description}}</p>
-                        <p class="section_content_header">Section Content</p>
-                        <p>Content Here</p>
-                        <a href="{{url_for('add_course_section_content', course_code=courseCode, section_id=section.section_id)}}"><button type="button" class="btn btn-primary">Add Content</button></a>
-                      </div>
-                    </div>
-                  {% endif %}
                 </div>
                 <br>
               </div>
@@ -109,6 +114,15 @@
 <style>
 .container {
   width : 90vw;
+}
+
+.section_content_header{
+  font-size: large;
+  font-weight: 600;
+}
+
+.content-title{
+  font-weight: 500;
 }
 </style>
 {% endblock %}
