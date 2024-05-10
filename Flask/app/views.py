@@ -816,6 +816,12 @@ def api_add_user():
 
                     return jsonify({"message": "User added successfully", "user_id": user_id, "password": password, "account_type": account_type})
                 except Exception as e:
+                    cursor.execute("select * from user where user_id = %s", (user_id,))
+                    check_duplicates = cursor.fetchone()
+                    if check_duplicates:
+                        cursor.execute("select MAX(user_id) from user;")
+                        new_id = int(cursor.fetchone()[0])+1
+                        return jsonify({"Duplicate user ID detected, try:" : new_id})
                     return jsonify({"message": "User not added", "error": str(e)})
         except Exception as e:
             return jsonify({"message": "Error processing request", "error": str(e)})
