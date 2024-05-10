@@ -47,7 +47,7 @@ def make_user (amount = [0]*len(user_index), type_= user_index, counter = 0):
 
 
 
-lecturer_amount,students_amount, admin_amount = 40,1500,2
+lecturer_amount,students_amount, admin_amount = 40,100000,2
 amount_index = [lecturer_amount, students_amount, admin_amount]
 make_user(amount=amount_index)
 save_json(persons, 'users.json')
