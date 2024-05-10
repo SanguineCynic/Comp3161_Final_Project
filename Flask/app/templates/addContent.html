@@ -17,15 +17,19 @@
 {% block main %}
 <div class="p-5 mb-4 bg-light rounded-3 border">
   <div class="container-fluid py-3">
-    <h1 class="display-5 fw-bold">Create Content for Section {{ courseCode }}!</h1>
+    <h1 class="display-5 fw-bold">Create Content for {{ courseCode }} in Section - Title: {{ section_title }}!</h1>
     <p>Here you will create a content for your section.</p>
+    {% include 'flash_messages.html' %}
     <div>
-        <form action="{{ url_for('login') }}" method="post">
+        <form action="{{ url_for('add_course_section_content', course_code=courseCode, section_id=sectionId) }}" method="post">
             <input type="text" name="title" placeholder="Title" class="form-input" required><br>
-            <input type="text" name="description" placeholder="Description" class="form-input" required><br>
-            <button type="submit" class="form-submit">Create Section</button>
+            <input type="text" name="fileName" placeholder="File Name" class="form-input"><br>
+            <textarea name="material" placeholder="Material" class="form-input" rows="4" cols="50"></textarea><br>
+            <button type="submit" class="form-submit">Add Content</button>
         </form>
     </div>
+    <br><br><br>
+    <a class="dropdown-item" href="{{url_for('view_selected_course', course_code=courseCode)}}"><button type="button" class="btn btn-primary">Back to Course</button></a>
   </div>
 </div>
 <style>

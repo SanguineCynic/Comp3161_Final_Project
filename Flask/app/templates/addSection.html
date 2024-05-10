@@ -19,6 +19,7 @@
   <div class="container-fluid py-3">
     <h1 class="display-5 fw-bold">Create Content Section for {{ courseCode }}!</h1>
     <p>Here you will create a section for your content to go into.</p>
+    {% include 'flash_messages.html' %}
     <div>
         <form action="{{ url_for('add_course_section', course_code=courseCode) }}" method="post">
             <input type="text" name="title" placeholder="Title" class="form-input" required><br>
@@ -26,6 +27,8 @@
             <button type="submit" class="form-submit">Create Section</button>
         </form>
     </div>
+    <br><br><br>
+    <a class="dropdown-item" href="{{url_for('view_selected_course', course_code=courseCode)}}"><button type="button" class="btn btn-primary">Back to Course</button></a>
   </div>
 </div>
 <style>
